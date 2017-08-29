@@ -26,6 +26,15 @@ public class IntegerIdGenerator implements IdentifierGenerator {
 					generatedId = (Integer) id;
 				}
 			}
+			else {
+				method = clazz.getMethod("getAutoId", (Class<?>[]) null);
+				if (method != null) {
+					Object id = method.invoke(object, (Object[]) null);
+					if (id != null) {
+						generatedId = (Integer) id;
+					}
+				}
+			}
 			
 		} catch (Exception e) {
 		}
