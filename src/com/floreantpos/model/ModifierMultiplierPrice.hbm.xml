@@ -3,10 +3,14 @@
 <hibernate-mapping package="com.floreantpos.model">
 	<class lazy="false" name="com.floreantpos.model.ModifierMultiplierPrice" table="MODIFIER_MULTIPLIER_PRICE">
 		<id column="ID" name="id" type="java.lang.Integer">
-			<generator class="com.floreantpos.util.IntegerIdGenerator" />
+			<generator class="hilo">
+				<param name="table">id_table</param>
+				<param name="column">next_value</param>
+				<param name="max_lo">1</param>
+			</generator>
 		</id>
 		<property column="PRICE" name="price" type="java.lang.Double">
-		    <meta attribute="defaultValue">null</meta>
+			<meta attribute="defaultValue">null</meta>
 		</property>
 		<many-to-one class="com.floreantpos.model.Multiplier" name="multiplier">
 			<column name="MULTIPLIER_ID" />
