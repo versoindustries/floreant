@@ -22,22 +22,35 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import net.miginfocom.swing.MigLayout;
 
 import com.floreantpos.POSConstants;
 import com.floreantpos.main.Application;
+import com.floreantpos.model.MenuItem;
+import com.floreantpos.model.dao.MenuItemDAO;
+import com.floreantpos.swing.BeanTableModel;
+import com.floreantpos.swing.PosButton;
+import com.floreantpos.swing.PosScrollPane;
 import com.floreantpos.swing.PosUIManager;
 import com.floreantpos.swing.QwertyKeyPad;
 import com.floreantpos.util.POSUtil;
 
 public class ItemSearchDialog extends OkCancelOptionDialog {
+
 	private JTextField tfNumber;
-	private String value;
-	private QwertyKeyPad qwertyKeyPad;
+	private JTable table;
+	private BeanTableModel<MenuItem> tableModel;
+	private MenuItem selectedItem;
 
 	public ItemSearchDialog() {
 		super(POSUtil.getFocusedWindow(), POSConstants.SEARCH_ITEM_BUTTON_TEXT);
@@ -53,6 +66,7 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 		setResizable(false);
 
 		JPanel contentPane = getContentPanel();
+		contentPane.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
 
 		MigLayout layout = new MigLayout("inset 0"); //$NON-NLS-1$ 
 		contentPane.setLayout(layout);
@@ -63,37 +77,82 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 		tfNumber.requestFocus();
 		tfNumber.setBackground(Color.WHITE);
 
-		tfNumber.addActionListener(new ActionListener() {
+		ActionListener searchListener = new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				doOk();
+				String searchString = tfNumber.getText();
+				if (searchString.equals("0") || searchString.equals("")) {
+					POSMessageDialog.showError(Application.getPosWindow(), "Please enter barcode or item no or name.");
+					return;
+				}
+				List<MenuItem> menuItems = new ArrayList<>();
+				MenuItem menuItem = MenuItemDAO.getInstance().getMenuItemByBarcode(searchString);
+				if (menuItem == null) {
+					try {
+						Integer id = Integer.valueOf(searchString);
+						menuItem = MenuItemDAO.getInstance().get(id);
+					} catch (Exception e2) {
+					}
+				}
+				if (menuItem == null) {
+					menuItems = MenuItemDAO.getInstance().getMenuItemByName(searchString);
+				}
+				if (menuItem != null) {
+					menuItems.add(menuItem);
+				}
+				if ((menuItems != null && menuItems.size() == 1)) {
+					selectedItem = menuItems.get(0);
+					doOk();
+				}
+				else {
+					tableModel.setRows(menuItems);
+				}
+			}
+		};
+		tfNumber.addActionListener(searchListener);
+
+		PosButton btnSearch = new PosButton(POSConstants.SEARCH);
+		btnSearch.addActionListener(searchListener);
+
+		contentPane.add(tfNumber, "spanx,split 2, grow"); //$NON-NLS-1$
+		contentPane.add(btnSearch, "w 90!");
+
+		PosScrollPane scrollPane = new PosScrollPane();
+		table = new JTable();
+		table.setRowHeight(35);
+		table.getTableHeader().setPreferredSize(PosUIManager.getSize(0, 0));
+		scrollPane.setViewportView(table);
+
+		tableModel = new BeanTableModel<MenuItem>(MenuItem.class);
+		tableModel.addColumn(POSConstants.NAME, MenuItem.PROP_NAME);
+
+		table.setModel(tableModel);
+		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				int index = table.getSelectedRow();
+				if (index < 0)
+					return;
+				index = table.convertRowIndexToModel(index);
+				selectedItem = tableModel.getRow(index);
 			}
 		});
 
-		qwertyKeyPad = new QwertyKeyPad();
+		QwertyKeyPad qwertyKeyPad = new QwertyKeyPad();
 
-		contentPane.add(tfNumber, "spanx, grow"); //$NON-NLS-1$
+		contentPane.add(scrollPane, "spanx,grow,h 170!,w 720!"); //$NON-NLS-1$
 		contentPane.add(qwertyKeyPad, "spanx ,grow"); //$NON-NLS-1$
 	}
 
 	@Override
 	public void doOk() {
-		String s = tfNumber.getText();
-		if (s.equals("0") || s.equals("")) {
-			POSMessageDialog.showError(Application.getPosWindow(), "Please enter barcode or item no.");
-			return;
-		}
-		setValue(tfNumber.getText());
 		setCanceled(false);
 		dispose();
 	}
 
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
+	public MenuItem getSelectedItem() {
+		return selectedItem;
 	}
 }

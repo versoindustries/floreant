@@ -183,8 +183,8 @@ public class TicketView extends JPanel {
 
 				txtSearchItem.requestFocus();
 
-				if (!addMenuItemByBarcode(dialog.getValue())) {
-					if (!addMenuItemByItemId(dialog.getValue())) {
+				if (!addMenuItemByBarcode(dialog.getSelectedItem())) {
+					if (!addMenuItemByItemId(dialog.getSelectedItem())) {
 						POSMessageDialog.showError(Application.getPosWindow(), "Item not found");
 					}
 				}
@@ -205,7 +205,6 @@ public class TicketView extends JPanel {
 	}
 
 	private boolean addMenuItemByItemId(String id) {
-
 		if (!isParsable(id)) {
 			return false;
 		}
@@ -213,7 +212,10 @@ public class TicketView extends JPanel {
 		Integer itemId = Integer.parseInt(id);
 
 		MenuItem menuItem = MenuItemDAO.getInstance().get(itemId);
+		return addMenuItemByItemId(menuItem);
+	}
 
+	private boolean addMenuItemByItemId(MenuItem menuItem) {
 		if (menuItem == null) {
 			return false;
 		}
@@ -231,11 +233,12 @@ public class TicketView extends JPanel {
 	}
 
 	private boolean addMenuItemByBarcode(String barcode) {
-
 		MenuItemDAO dao = new MenuItemDAO();
-
 		MenuItem menuItem = dao.getMenuItemByBarcode(barcode);
+		return addMenuItemByBarcode(menuItem);
+	}
 
+	private boolean addMenuItemByBarcode(MenuItem menuItem) {
 		if (menuItem == null) {
 			return false;
 		}

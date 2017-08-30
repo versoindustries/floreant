@@ -148,7 +148,7 @@ public class DiscountSelectionDialog extends OkCancelOptionDialog implements Act
 		btnSearch.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ItemSearchDialog dialog = new ItemSearchDialog(Application.getPosWindow());
+				PosTextInputDialog dialog = new PosTextInputDialog(Application.getPosWindow());
 				dialog.setTitle("Search Coupon");
 				dialog.pack();
 				dialog.open();
