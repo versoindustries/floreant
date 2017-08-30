@@ -177,7 +177,7 @@ public class MultiCurrencyTenderDialog extends OkCancelOptionDialog {
 	}
 
 	private boolean isValidAmount() {
-		double remainingBalance = dueAmount - (totalTenderedAmount - totalCashBackAmount);
+		double remainingBalance = NumberUtil.roundToThreeDigit(dueAmount - (totalTenderedAmount - totalCashBackAmount));
 		if (totalTenderedAmount <= 0 || remainingBalance < 0) {
 			return false;
 		}
@@ -196,7 +196,7 @@ public class MultiCurrencyTenderDialog extends OkCancelOptionDialog {
 
 	private boolean isTolerable() {
 		double tolerance = CurrencyUtil.getMainCurrency().getTolerance();
-		double diff = dueAmount - (totalTenderedAmount - totalCashBackAmount);
+		double diff = NumberUtil.roundToThreeDigit(dueAmount - (totalTenderedAmount - totalCashBackAmount));
 		if (diff <= tolerance) {
 			if (diff > 0) {
 				doAddToleranceToTicketDiscount(diff);
