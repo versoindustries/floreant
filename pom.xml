@@ -9,7 +9,7 @@
 	</properties>
 
 	<scm>
-		<connection>scm:svn:http://svn.code.sf.net/p/floreantpos/code/trunk</connection>
+		<connection>scm:svn:https://svn.code.sf.net/p/floreantpos/code/branches/v1.5</connection>
 	</scm>
 
 	<build>
@@ -141,7 +141,7 @@
 						<phase>package</phase>
 						<configuration>
 							<target>
-								<zip destfile="${project.build.directory}/${project.build.finalName}-1.4-build${buildNumber}.zip" basedir="${project.build.directory}/${project.build.finalName}-bin/${project.build.finalName}"></zip>
+								<zip destfile="${project.build.directory}/${project.build.finalName}-1.5-build${buildNumber}.zip" basedir="${project.build.directory}/${project.build.finalName}-bin/${project.build.finalName}"></zip>
 							</target>
 						</configuration>
 						<goals>
