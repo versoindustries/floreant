@@ -48,6 +48,7 @@ import com.floreantpos.model.dao.MenuItemDAO;
 import com.floreantpos.model.dao.MenuItemModifierGroupDAO;
 import com.floreantpos.model.dao.MenuModifierDAO;
 import com.floreantpos.model.dao.MenuModifierGroupDAO;
+import com.floreantpos.model.dao.TaxDAO;
 import com.floreantpos.ui.dialog.POSMessageDialog;
 import com.floreantpos.util.datamigrate.Elements;
 
@@ -102,8 +103,7 @@ public class DataImportAction extends AbstractAction {
 				for (Tax tax : taxes) {
 					objectMap.put(tax.getUniqueId(), tax);
 					tax.setId(1);
-
-					//TaxDAO.getInstance().saveOrUpdate(tax);
+					TaxDAO.getInstance().save(tax);
 				}
 			}
 

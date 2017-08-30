@@ -61,6 +61,7 @@ import com.floreantpos.ui.dialog.POSDialog;
 import com.floreantpos.ui.dialog.POSMessageDialog;
 import com.floreantpos.ui.views.order.TicketForSplitView;
 import com.floreantpos.util.NumberUtil;
+import com.floreantpos.util.POSUtil;
 
 /**
  *
@@ -247,6 +248,10 @@ public class SplitTicketDialog extends POSDialog {
 	}//GEN-LAST:event_btnCancelActionPerformed
 
 	private synchronized void btnFinishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinishActionPerformed
+		if (mainTicketView.getTicket().getTicketItems().isEmpty()) {
+			POSMessageDialog.showMessage(POSUtil.getFocusedWindow(), "Main ticket cannot be blank.");
+			return;
+		}
 		Session session = null;
 		Transaction tx = null;
 
