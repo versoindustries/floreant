@@ -17,6 +17,7 @@
 		<property name="email" column="EMAIL" length="40" type="string" />
 		<property name="salutation" column="SALUTATION" length="60" type="string" />
 		<property name="firstName" column="FIRST_NAME" length="60" type="string" />
+		<property name="middleName" column="MIDDLE_NAME" length="32"  type="java.lang.String" />
 		<property name="lastName" column="LAST_NAME" length="60" type="string" />
 		<property name="name" column="name" length="120" type="string" />
 		<property name="dob" column="DOB" length="16" type="string" />
@@ -32,6 +33,11 @@
 		<property name="creditCardNo" column="CREDIT_CARD_NO" length="30" type="string" />
 		<property name="note" column="NOTE" length="255" type="string" />
 		
+		<property column="PHOTO_ID" length="128" name="photoId" type="java.lang.String" />
+		<property column="TAX_ID" length="128" name="taxId" type="java.lang.String" />
+		<property column="TAX_EXEMPT" name="taxExempt" type="java.lang.Boolean" />
+		<property column="NO_TAX" name="noTax" type="java.lang.Boolean" />
+
 		<bag cascade="all,delete-orphan" inverse="true" lazy="false" name="deliveryAddresses" table="DELIVERY_ADDRESS">
 			<key>
 				<column name="CUSTOMER_ID" />

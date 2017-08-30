@@ -1,5 +1,6 @@
 package com.floreantpos.model.base;
 
+import java.lang.Comparable;
 import java.io.Serializable;
 
 
@@ -15,17 +16,24 @@ import java.io.Serializable;
 public abstract class BaseTerminal  implements Comparable, Serializable {
 
 	public static String REF = "Terminal"; //$NON-NLS-1$
-	public static String PROP_NAME = "name"; //$NON-NLS-1$
-	public static String PROP_ACTIVE = "active"; //$NON-NLS-1$
+	public static String PROP_SEQUENCE_START = "sequenceStart"; //$NON-NLS-1$
 	public static String PROP_OPENING_BALANCE = "openingBalance"; //$NON-NLS-1$
-	public static String PROP_TERMINAL_KEY = "terminalKey"; //$NON-NLS-1$
-	public static String PROP_ASSIGNED_USER = "assignedUser"; //$NON-NLS-1$
 	public static String PROP_HAS_CASH_DRAWER = "hasCashDrawer"; //$NON-NLS-1$
 	public static String PROP_CURRENT_BALANCE = "currentBalance"; //$NON-NLS-1$
-	public static String PROP_LOCATION = "location"; //$NON-NLS-1$
-	public static String PROP_ID = "id"; //$NON-NLS-1$
 	public static String PROP_FLOOR_ID = "floorId"; //$NON-NLS-1$
+	public static String PROP_TERMINAL_KEY = "terminalKey"; //$NON-NLS-1$
+	public static String PROP_ASSIGNED_USER = "assignedUser"; //$NON-NLS-1$
+	public static String PROP_RECEIPT_PRINTER_ID = "receiptPrinterId"; //$NON-NLS-1$
+	public static String PROP_NAME = "name"; //$NON-NLS-1$
+	public static String PROP_SEQUENCE_END = "sequenceEnd"; //$NON-NLS-1$
+	public static String PROP_ACTIVE = "active"; //$NON-NLS-1$
+	public static String PROP_CASHIER_NO = "cashierNo"; //$NON-NLS-1$
+	public static String PROP_NEXT_AVAILABLE_SEQ = "nextAvailableSeq"; //$NON-NLS-1$
+	public static String PROP_VALID_TO = "validTo"; //$NON-NLS-1$
+	public static String PROP_VALID_FROM = "validFrom"; //$NON-NLS-1$
 	public static String PROP_IN_USE = "inUse"; //$NON-NLS-1$
+	public static String PROP_ID = "id"; //$NON-NLS-1$
+	public static String PROP_LOCATION = "location"; //$NON-NLS-1$
 
 
 	// constructors
@@ -60,6 +68,13 @@ public abstract class BaseTerminal  implements Comparable, Serializable {
 		protected java.lang.Boolean active;
 		protected java.lang.String location;
 		protected java.lang.Integer floorId;
+		protected java.lang.String cashierNo;
+		protected java.lang.String receiptPrinterId;
+		protected java.util.Date validFrom;
+		protected java.util.Date validTo;
+		protected java.lang.Long sequenceStart;
+		protected java.lang.Long sequenceEnd;
+		protected java.lang.Long nextAvailableSeq;
 
 	// many to one
 	private com.floreantpos.model.User assignedUser;
@@ -242,6 +257,125 @@ public abstract class BaseTerminal  implements Comparable, Serializable {
 
 
 	/**
+	 * Return the value associated with the column: CASHIER_NO
+	 */
+	public java.lang.String getCashierNo () {
+					return cashierNo;
+			}
+
+	/**
+	 * Set the value related to the column: CASHIER_NO
+	 * @param cashierNo the CASHIER_NO value
+	 */
+	public void setCashierNo (java.lang.String cashierNo) {
+		this.cashierNo = cashierNo;
+	}
+
+
+
+	/**
+	 * Return the value associated with the column: RECEIPT_PRINTER_ID
+	 */
+	public java.lang.String getReceiptPrinterId () {
+					return receiptPrinterId;
+			}
+
+	/**
+	 * Set the value related to the column: RECEIPT_PRINTER_ID
+	 * @param receiptPrinterId the RECEIPT_PRINTER_ID value
+	 */
+	public void setReceiptPrinterId (java.lang.String receiptPrinterId) {
+		this.receiptPrinterId = receiptPrinterId;
+	}
+
+
+
+	/**
+	 * Return the value associated with the column: VALID_FROM
+	 */
+	public java.util.Date getValidFrom () {
+					return validFrom;
+			}
+
+	/**
+	 * Set the value related to the column: VALID_FROM
+	 * @param validFrom the VALID_FROM value
+	 */
+	public void setValidFrom (java.util.Date validFrom) {
+		this.validFrom = validFrom;
+	}
+
+
+
+	/**
+	 * Return the value associated with the column: VALID_TO
+	 */
+	public java.util.Date getValidTo () {
+					return validTo;
+			}
+
+	/**
+	 * Set the value related to the column: VALID_TO
+	 * @param validTo the VALID_TO value
+	 */
+	public void setValidTo (java.util.Date validTo) {
+		this.validTo = validTo;
+	}
+
+
+
+	/**
+	 * Return the value associated with the column: SEQUENCE_START
+	 */
+	public java.lang.Long getSequenceStart () {
+					return sequenceStart;
+			}
+
+	/**
+	 * Set the value related to the column: SEQUENCE_START
+	 * @param sequenceStart the SEQUENCE_START value
+	 */
+	public void setSequenceStart (java.lang.Long sequenceStart) {
+		this.sequenceStart = sequenceStart;
+	}
+
+
+
+	/**
+	 * Return the value associated with the column: SEQUENCE_END
+	 */
+	public java.lang.Long getSequenceEnd () {
+					return sequenceEnd;
+			}
+
+	/**
+	 * Set the value related to the column: SEQUENCE_END
+	 * @param sequenceEnd the SEQUENCE_END value
+	 */
+	public void setSequenceEnd (java.lang.Long sequenceEnd) {
+		this.sequenceEnd = sequenceEnd;
+	}
+
+
+
+	/**
+	 * Return the value associated with the column: NEXT_AVAILABLE_SEQ
+	 */
+	public java.lang.Long getNextAvailableSeq () {
+					return nextAvailableSeq;
+			}
+
+	/**
+	 * Set the value related to the column: NEXT_AVAILABLE_SEQ
+	 * @param nextAvailableSeq the NEXT_AVAILABLE_SEQ value
+	 */
+	public void setNextAvailableSeq (java.lang.Long nextAvailableSeq) {
+		this.nextAvailableSeq = nextAvailableSeq;
+	}
+
+
+
+	/**
 	 * Return the value associated with the column: ASSIGNED_USER
 	 */
 	public com.floreantpos.model.User getAssignedUser () {
@@ -265,7 +399,7 @@ public abstract class BaseTerminal  implements Comparable, Serializable {
 		if (!(obj instanceof com.floreantpos.model.Terminal)) return false;
 		else {
 			com.floreantpos.model.Terminal terminal = (com.floreantpos.model.Terminal) obj;
-			if (null == this.getId() || null == terminal.getId()) return false;
+			if (null == this.getId() || null == terminal.getId()) return this == obj;
 			else return (this.getId().equals(terminal.getId()));
 		}
 	}
