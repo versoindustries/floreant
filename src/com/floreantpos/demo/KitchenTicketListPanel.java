@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
 import javax.swing.AbstractButton;
@@ -335,6 +336,91 @@ public class KitchenTicketListPanel extends JPanel implements ComponentListener 
 
 	public void setBackButtonVisible(boolean b) {
 		btnBack.setVisible(b);
+	}
+
+	public void setSelectedKey(int key) {
+		Component[] components = selectionButtonsPanel.getComponents();
+		if (components.length == 0)
+			return;
+
+		int previousSelectedIndex = 0;
+		int selectedIndex = 0;
+		int count = 0;
+
+		boolean active = false;
+		boolean numberSelected = false;
+
+		for (Component component : components) {
+			if (component instanceof KitchenTicketView) {
+				KitchenTicketView kitchenTicketView = (KitchenTicketView) component;
+				if (key == KeyEvent.VK_SPACE && kitchenTicketView.isKeySelected()) {
+					kitchenTicketView.fireBumpSelected();
+					return;
+				}
+				else if (key != KeyEvent.VK_LEFT && key != KeyEvent.VK_RIGHT && key != KeyEvent.VK_DOWN && key != KeyEvent.VK_UP) {
+					boolean selected = kitchenTicketView.keySelected(key);
+					if (selected) {
+						numberSelected = true;
+					}
+				}
+				if (kitchenTicketView.isKeySelected()) {
+					active = true;
+					selectedIndex = count;
+					previousSelectedIndex = count;
+				}
+			}
+			count++;
+		}
+		if (numberSelected)
+			return;
+
+		boolean scrollSelected = true;
+		if (active) {
+			if (key != KeyEvent.VK_SPACE) {
+				switch (key) {
+					case KeyEvent.VK_RIGHT:
+						selectedIndex++;
+						if (selectedIndex >= (horizontalPanelCount * 2)) {
+							selectedIndex = 0;
+						}
+						break;
+					case KeyEvent.VK_LEFT:
+						selectedIndex--;
+						if (selectedIndex < 0)
+							return;
+						break;
+					case KeyEvent.VK_DOWN:
+						selectedIndex += horizontalPanelCount;
+						if (selectedIndex >= (horizontalPanelCount * 2))
+							return;
+						break;
+					case KeyEvent.VK_UP:
+						selectedIndex -= horizontalPanelCount;
+						if (selectedIndex >= (horizontalPanelCount * 2))
+							return;
+						break;
+					default:
+						scrollSelected = false;
+						break;
+				}
+			}
+		}
+		if (scrollSelected) {
+			if (selectedIndex < 0 || components.length < (selectedIndex + 1)) {
+				return;
+			}
+			KitchenTicketView kitchenTicketView = (KitchenTicketView) components[selectedIndex];
+			if (kitchenTicketView == null)
+				return;
+			kitchenTicketView.setSelected(true);
+
+			if (selectedIndex != previousSelectedIndex) {
+				KitchenTicketView previousTicketView = (KitchenTicketView) components[previousSelectedIndex];
+				if (previousTicketView == null)
+					return;
+				previousTicketView.setSelected(false);
+			}
+		}
 	}
 
 }

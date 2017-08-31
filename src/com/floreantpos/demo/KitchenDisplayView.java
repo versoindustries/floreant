@@ -19,8 +19,11 @@ package com.floreantpos.demo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
@@ -41,6 +44,7 @@ public class KitchenDisplayView extends ViewPanel implements ActionListener {
 
 	private Timer viewUpdateTimer;
 	private boolean showHeader;
+	private KeyboardDispatcher dispatcher;
 
 	public KitchenDisplayView(boolean showHeader) {
 		this.showHeader = showHeader;
@@ -53,6 +57,7 @@ public class KitchenDisplayView extends ViewPanel implements ActionListener {
 		add(ticketPanel);
 		viewUpdateTimer = new Timer(10 * 1000, this);
 		viewUpdateTimer.setRepeats(true);
+		dispatcher = new KeyboardDispatcher();
 	}
 
 	@Override
@@ -66,9 +71,31 @@ public class KitchenDisplayView extends ViewPanel implements ActionListener {
 			if (!viewUpdateTimer.isRunning()) {
 				viewUpdateTimer.start();
 			}
+			KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+			manager.addKeyEventDispatcher(dispatcher);
 		}
 		else {
+			KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+			manager.removeKeyEventDispatcher(dispatcher);
 			cleanup();
+		}
+	}
+
+	private class KeyboardDispatcher implements KeyEventDispatcher {
+		@Override
+		public boolean dispatchKeyEvent(KeyEvent e) {
+			if (e.getID() == KeyEvent.KEY_PRESSED) {
+				if (viewUpdateTimer.isRunning()) {
+					viewUpdateTimer.stop();
+				}
+				ticketPanel.setSelectedKey(e.getKeyCode());
+				viewUpdateTimer.restart();
+			}
+			else if (e.getID() == KeyEvent.KEY_RELEASED) {
+			}
+			else if (e.getID() == KeyEvent.KEY_TYPED) {
+			}
+			return false;
 		}
 	}
 

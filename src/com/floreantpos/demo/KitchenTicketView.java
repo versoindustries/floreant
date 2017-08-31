@@ -23,10 +23,17 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Frame;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
 import java.util.Date;
 import java.util.List;
 
@@ -78,6 +85,7 @@ public class KitchenTicketView extends JPanel {
 	private JLabel ticketInfo;
 	private JLabel tableInfo;
 	private JLabel serverInfo;
+	private BumpButton btnDone;
 
 	public KitchenTicketView(KitchenTicket ticket) {
 		this.kitchenTicket = ticket;
@@ -269,12 +277,11 @@ public class KitchenTicketView extends JPanel {
 		});
 		//buttonPanel.add(btnVoid);
 
-		StyledButton btnDone = new StyledButton(POSConstants.BUMP); //$NON-NLS-1$
-		btnDone.setGap(2, 0);
+		btnDone = new BumpButton(POSConstants.BUMP);
 		btnDone.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				closeTicket(KitchenTicketStatus.DONE);
+
 			}
 		});
 
@@ -435,5 +442,97 @@ public class KitchenTicketView extends JPanel {
 		} catch (Exception e) {
 			POSMessageDialog.showError(KitchenTicketView.this, e.getMessage(), e);
 		}
+	}
+
+	private class BumpButton extends PosButton implements ActionListener {
+		private Boolean keySelected = false;
+
+		public BumpButton(String string) {
+			super(string);
+			setOpaque(false);
+			addActionListener(this);
+			setBackground(Color.white);
+			setBorder(BorderFactory.createLineBorder(Color.white));
+		}
+
+		@Override
+		protected void paintComponent(Graphics g) {
+			g.setColor(getBackground());
+			g.fillRect(0, 0, getWidth(), getHeight());
+
+			Color color1 = getBackground();// UIManager.getColor("control");
+			Color color2 = color1.brighter();
+
+			int buttonX = 0;
+			int buttonY = 0;
+			int width = getWidth();
+			int height = getHeight();
+
+			GradientPaint gp = new GradientPaint(buttonX, buttonY, color2, width - 2, height - 2, color1, true);
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setPaint(gp);
+			g2.fillRect(buttonX, buttonY, width, height);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			if (keySelected) {
+				g2.setColor(new Color(0, 160, 0));
+			}
+			else {
+				g2.setColor(new Color(234, 42, 42));
+			}
+			int h = getHeight() - 10;
+			g2.fillOval(10, 4, h, h);
+			g2.setColor(Color.WHITE);
+			g2.setFont(new Font(getFont().getName(), Font.BOLD, 20));
+			FontMetrics fm = g2.getFontMetrics();
+			Rectangle2D r = fm.getStringBounds(getKey(), g2);
+			int x = ((h + 10 - (int) r.getWidth() + 10) / 2);
+			int y = (h - (int) r.getHeight()) / 2 + fm.getAscent();
+			g2.drawString(getKey(), x, y + 2);
+			g2.setFont(getFont());
+			g2.setBackground(getBackground());
+			super.paintComponent(g2);
+		}
+
+		public Boolean isKeySelected() {
+			return keySelected;
+		}
+
+		public void setKeySelected(Boolean keySelected) {
+			this.keySelected = keySelected;
+			repaint();
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			closeTicket(KitchenTicketStatus.DONE);
+		}
+	}
+
+	public boolean keySelected(int key) {
+		String keyString = KeyEvent.getKeyText(key);
+		if (keyString.contains("NumPad-")) {
+			keyString = keyString.split("-")[1];
+		}
+		Object kitchenKey = getClientProperty("key");
+		String keyValue = String.valueOf(kitchenKey);
+		boolean keySelected = keyValue.equals(keyString);
+		btnDone.setKeySelected(keySelected);
+		return keySelected;
+	}
+
+	public void setSelected(boolean b) {
+		btnDone.setKeySelected(b);
+	}
+
+	public boolean isKeySelected() {
+		return btnDone.isKeySelected();
+	}
+
+	public void fireBumpSelected() {
+		btnDone.actionPerformed(null);
+	}
+
+	protected String getKey() {
+		return String.valueOf(getClientProperty("key"));
 	}
 }
