@@ -45,6 +45,7 @@ public class TimerWatch extends JPanel implements ActionListener {
 
 	public TimerWatch(Date date) {
 		this.date = date;
+		setOpaque(false);
 
 		timerLabel.setFont(timerLabel.getFont().deriveFont(Font.BOLD, 13f));
 		timerLabel.setHorizontalAlignment(JLabel.RIGHT);
@@ -61,24 +62,24 @@ public class TimerWatch extends JPanel implements ActionListener {
 		Interval interval = new Interval(date.getTime(), new Instant().getMillis());
 		Duration duration = interval.toDuration();
 
-		int timeOutValueYellow = 300; 
-		int timeOutValueRed = 600; 
-		
-		if(AppConfig.getString("YellowTimeOut")!=null ) {
+		int timeOutValueYellow = 300;
+		int timeOutValueRed = 600;
+
+		if (AppConfig.getString("YellowTimeOut") != null) {
 			timeOutValueYellow = Integer.parseInt(AppConfig.getString("YellowTimeOut")); //$NON-NLS-1$
 		}
-		
-		if(AppConfig.getString("RedTimeOut")!=null){
+
+		if (AppConfig.getString("RedTimeOut") != null) {
 			timeOutValueRed = Integer.parseInt(AppConfig.getString("RedTimeOut")); //$NON-NLS-1$
 		}
 
 		if (timeOutValueYellow < duration.getStandardSeconds() && timeOutValueRed > duration.getStandardSeconds()) {
 			backColor = Color.yellow;
-			textColor=Color.black;
+			textColor = Color.black;
 		}
 		else if (timeOutValueRed < duration.getStandardSeconds()) {
 			backColor = Color.red;
-			textColor=Color.white; 
+			textColor = Color.white;
 		}
 		else {
 			backColor = Color.black;

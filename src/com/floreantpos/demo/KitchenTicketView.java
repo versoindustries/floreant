@@ -152,6 +152,8 @@ public class KitchenTicketView extends JPanel {
 		//timerWatch.setPreferredSize(new Dimension(100, 30));
 
 		headerPanel = new JPanel(new MigLayout("fill", "sg, fill", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		headerPanel.setBackground(Color.black);
+		headerPanel.setForeground(Color.white);
 		headerPanel.setBorder(BorderFactory.createLineBorder(Color.white));
 		headerPanel.add(ticketInfo, "split 2"); //$NON-NLS-1$
 		ticketInfo.setFont(ticketInfo.getFont().deriveFont(Font.BOLD, 13f));
