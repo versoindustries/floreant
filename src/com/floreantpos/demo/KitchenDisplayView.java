@@ -19,26 +19,14 @@ package com.floreantpos.demo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
-import net.miginfocom.swing.MigLayout;
-
-import com.floreantpos.Messages;
-import com.floreantpos.actions.LogoutAction;
 import com.floreantpos.config.TerminalConfig;
 import com.floreantpos.main.Application;
-import com.floreantpos.model.OrderType;
-import com.floreantpos.swing.PosButton;
-import com.floreantpos.swing.PosUIManager;
-import com.floreantpos.ui.dialog.NumberSelectionDialog2;
 import com.floreantpos.ui.dialog.POSMessageDialog;
 import com.floreantpos.ui.views.order.RootView;
 import com.floreantpos.ui.views.order.ViewPanel;
@@ -51,82 +39,16 @@ public class KitchenDisplayView extends ViewPanel implements ActionListener {
 
 	private KitchenTicketListPanel ticketPanel;
 
-	private PosButton btnFilter;
 	private Timer viewUpdateTimer;
-	private PosButton btnLogout;
-
-	private PosButton btnBack;
-
-	private List<String> selectedPrinters;
-	private List<OrderType> selectedOrderTypes;
-
 	private boolean showHeader;
 
 	public KitchenDisplayView(boolean showHeader) {
 		this.showHeader = showHeader;
 		setLayout(new BorderLayout(5, 5));
-		JPanel firstTopPanel = new JPanel(new BorderLayout(5, 5));
-
-		btnBack = new PosButton(Messages.getString("KitchenDisplayView.1")); //$NON-NLS-1$
-		btnBack.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				RootView.getInstance().showDefaultView();
-			}
-		});
-
-		btnFilter = new PosButton(Messages.getString("KitchenDisplayView.2")); //$NON-NLS-1$
-		btnFilter.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				KitchenFilterDialog dialog = new KitchenFilterDialog();
-				dialog.setSelectedPrinters(selectedPrinters);
-				dialog.setSelectedOrderTypes(selectedOrderTypes);
-				dialog.open();
-
-				if (dialog.isCanceled())
-					return;
-
-				ticketPanel.getDataModel().setCurrentRowIndex(0);
-				selectedPrinters = dialog.getSelectedPrinters();
-				selectedOrderTypes = dialog.getSelectedOrderTypes();
-
-				updateTicketView();
-			}
-		});
-
-		JPanel topPanel = new JPanel(new MigLayout("right, ins 2 2 0 2,hidemode 3", "", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		Dimension size = PosUIManager.getSize(60, 40);
-
-		topPanel.add(btnFilter, "w " + size.width + "!,h " + size.height + "!"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		topPanel.setBackground(Color.white);
-
-		PosButton btnOption = new PosButton(Messages.getString("KitchenDisplayView.8")); //$NON-NLS-1$
-		btnOption.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int value = NumberSelectionDialog2.takeIntInput(Messages.getString("KitchenDisplayView.9")); //$NON-NLS-1$
-				if (value == -1)
-					return;
-				TerminalConfig.setKDSTicketsPerPage(value);
-				updateTicketView();
-			}
-		});
-		topPanel.add(btnOption, "w " + size.width + "!, h " + size.height + "!"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		topPanel.add(btnBack, "w " + size.width + "!, h " + size.height + "!"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		btnLogout = new PosButton(new LogoutAction(true, false)); //$NON-NLS-1$
-		topPanel.add(btnLogout, "w " + size.width + "!, h " + size.height + "!, wrap"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-		firstTopPanel.setBackground(Color.white);
-		firstTopPanel.setPreferredSize(new Dimension(0, PosUIManager.getSize(50)));
-		firstTopPanel.add(topPanel);
-		firstTopPanel.add(new JSeparator(), BorderLayout.SOUTH);
-		add(firstTopPanel, BorderLayout.NORTH);
+		setBackground(Color.black);
 
 		ticketPanel = new KitchenTicketListPanel();
+		ticketPanel.setBackground(Color.black);
 		ticketPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		add(ticketPanel);
 		viewUpdateTimer = new Timer(10 * 1000, this);
@@ -139,7 +61,7 @@ public class KitchenDisplayView extends ViewPanel implements ActionListener {
 		if (b) {
 			RootView.getInstance().getHeaderPanel().setVisible(showHeader);
 			String currentView = TerminalConfig.getDefaultView();
-			btnBack.setVisible(currentView != null && !currentView.equals(VIEW_NAME));
+			ticketPanel.setBackButtonVisible(currentView != null && !currentView.equals(VIEW_NAME));
 			updateTicketView();
 			if (!viewUpdateTimer.isRunning()) {
 				viewUpdateTimer.start();
@@ -166,7 +88,7 @@ public class KitchenDisplayView extends ViewPanel implements ActionListener {
 	private synchronized void updateTicketView() {
 		try {
 			viewUpdateTimer.stop();
-			ticketPanel.updateKDSView(selectedPrinters, selectedOrderTypes);
+			ticketPanel.updateKDSView();
 			revalidate();
 			repaint();
 		} catch (Exception e2) {

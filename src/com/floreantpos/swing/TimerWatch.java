@@ -46,8 +46,10 @@ public class TimerWatch extends JPanel implements ActionListener {
 	public TimerWatch(Date date) {
 		this.date = date;
 
-		timerLabel.setFont(timerLabel.getFont().deriveFont(Font.BOLD));
+		timerLabel.setFont(timerLabel.getFont().deriveFont(Font.BOLD, 13f));
 		timerLabel.setHorizontalAlignment(JLabel.RIGHT);
+		timerLabel.setOpaque(false);
+		timerLabel.setForeground(Color.white);
 
 		actionPerformed(null);
 
@@ -79,8 +81,8 @@ public class TimerWatch extends JPanel implements ActionListener {
 			textColor=Color.white; 
 		}
 		else {
-			backColor = Color.white;
-			textColor=Color.black;
+			backColor = Color.black;
+			textColor = Color.white;
 		}
 
 		timerLabel.setText(duration.getStandardHours() + ":" + (duration.getStandardMinutes() % 60) + ":" + (duration.getStandardSeconds() % 60)); //$NON-NLS-1$ //$NON-NLS-2$

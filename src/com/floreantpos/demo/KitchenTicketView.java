@@ -21,6 +21,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridLayout;
@@ -57,7 +58,6 @@ import com.floreantpos.model.TicketItem;
 import com.floreantpos.model.dao.KitchenTicketDAO;
 import com.floreantpos.model.dao.KitchenTicketItemDAO;
 import com.floreantpos.model.dao.TicketDAO;
-import com.floreantpos.swing.ButtonColumn;
 import com.floreantpos.swing.ListTableModel;
 import com.floreantpos.swing.PosButton;
 import com.floreantpos.swing.PosUIManager;
@@ -65,11 +65,11 @@ import com.floreantpos.swing.TimerWatch;
 import com.floreantpos.ui.dialog.POSMessageDialog;
 
 public class KitchenTicketView extends JPanel {
-	KitchenTicket kitchenTicket;
-	JLabel ticketId = new JLabel();
-	KitchenTicketTableModel tableModel;
-	JTable table;
-	KitchenTicketStatusSelector statusSelector;
+	private KitchenTicket kitchenTicket;
+	private JLabel ticketId = new JLabel();
+	private KitchenTicketTableModel tableModel;
+	private JTable table;
+	private KitchenTicketStatusSelector statusSelector;
 	private TimerWatch timerWatch;
 	private JScrollPane scrollPane;
 
@@ -82,6 +82,8 @@ public class KitchenTicketView extends JPanel {
 	public KitchenTicketView(KitchenTicket ticket) {
 		this.kitchenTicket = ticket;
 		setLayout(new BorderLayout(1, 1));
+		setBackground(Color.black);
+
 		createHeader(ticket);
 		createTable(ticket);
 		createButtonPanel();
@@ -138,11 +140,13 @@ public class KitchenTicketView extends JPanel {
 		serverInfo.setFont(font);
 
 		timerWatch = new TimerWatch(ticket.getCreateDate());
+		timerWatch.setBackground(Color.black);
 		//timerWatch.setPreferredSize(new Dimension(100, 30));
 
 		headerPanel = new JPanel(new MigLayout("fill", "sg, fill", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		headerPanel.setBorder(BorderFactory.createLineBorder(Color.gray));
+		headerPanel.setBorder(BorderFactory.createLineBorder(Color.white));
 		headerPanel.add(ticketInfo, "split 2"); //$NON-NLS-1$
+		ticketInfo.setFont(ticketInfo.getFont().deriveFont(Font.BOLD, 13f));
 		headerPanel.add(timerWatch, "right,wrap, span"); //$NON-NLS-1$
 		headerPanel.add(tableInfo, "split 2, grow"); //$NON-NLS-1$
 		headerPanel.add(serverInfo, "right,span"); //$NON-NLS-1$
@@ -157,6 +161,9 @@ public class KitchenTicketView extends JPanel {
 		table.setCellSelectionEnabled(false);
 		table.setRowHeight(30);
 		table.setTableHeader(null);
+		table.setOpaque(false);
+		table.setIntercellSpacing(new Dimension(0, 0));
+		table.setShowGrid(false);
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -172,10 +179,12 @@ public class KitchenTicketView extends JPanel {
 						rendererComponent.setBackground(new Color(128, 0, 128));
 					}
 					else {
-						rendererComponent.setBackground(Color.white);
+						rendererComponent.setBackground(Color.black);
+						rendererComponent.setForeground(Color.white);
 					}
 				}
-
+				Font font = getFont().deriveFont(Font.BOLD, 16f);
+				rendererComponent.setFont(font);
 				if (column == 1) {
 					if (ticketItem.getQuantity() <= 0) {
 						return new JLabel();
@@ -204,15 +213,20 @@ public class KitchenTicketView extends JPanel {
 			}
 		};
 
-		new ButtonColumn(table, action, 2) {
+		new CustomButtonColumn(table, action, 2) {
 
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 				KitchenTicketItem ticketItem = tableModel.getRowData(row);
 				if (ticketItem.getQuantity() <= 0) {
-					return new JLabel();
+					JLabel jLabel = new JLabel();
+					jLabel.setOpaque(false);
+					return jLabel;
 				}
-				return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				Component tableCellRendererComponent = (Component) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				Font font = getFont().deriveFont(Font.BOLD, 12f);
+				tableCellRendererComponent.setFont(font);
+				return tableCellRendererComponent;
 			}
 
 			@Override
@@ -221,11 +235,16 @@ public class KitchenTicketView extends JPanel {
 				if (ticketItem.getQuantity() <= 0) {
 					return new JLabel();
 				}
-				return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+				Component tableCellEditorComponent = (Component) super.getTableCellEditorComponent(table, value, isSelected, row, column);
+				Font font = getFont().deriveFont(Font.BOLD, 12f);
+				tableCellEditorComponent.setFont(font);
+				return tableCellEditorComponent;
 			}
 
 		};
 		scrollPane = new JScrollPane(table);
+		scrollPane.setViewportBorder(BorderFactory.createLineBorder(Color.white));
+		scrollPane.getViewport().setBackground(Color.black);
 		add(scrollPane);
 	}
 
@@ -250,7 +269,8 @@ public class KitchenTicketView extends JPanel {
 		});
 		//buttonPanel.add(btnVoid);
 
-		PosButton btnDone = new PosButton(POSConstants.BUMP); //$NON-NLS-1$
+		StyledButton btnDone = new StyledButton(POSConstants.BUMP); //$NON-NLS-1$
+		btnDone.setGap(2, 0);
 		btnDone.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -259,8 +279,8 @@ public class KitchenTicketView extends JPanel {
 		});
 
 		btnDone.setPreferredSize(PosUIManager.getSize(100, 40));
-
 		buttonPanel.add(btnDone);
+		buttonPanel.setOpaque(false);
 
 		//		PosButton btnPrint = new PosButton("PRINT");
 		//		btnPrint.addActionListener(new ActionListener() {
@@ -297,7 +317,7 @@ public class KitchenTicketView extends JPanel {
 	private void resizeTableColumns() {
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		setColumnWidth(1, PosUIManager.getSize(40));
-		setColumnWidth(2, PosUIManager.getSize(50));
+		setColumnWidth(2, PosUIManager.getSize(60));
 	}
 
 	private void setColumnWidth(int columnNumber, int width) {
