@@ -18,6 +18,7 @@
 package com.floreantpos.ui.dialog;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -29,8 +30,11 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import net.miginfocom.swing.MigLayout;
@@ -45,6 +49,8 @@ import com.floreantpos.swing.PosButton;
 import com.floreantpos.swing.PosScrollPane;
 import com.floreantpos.swing.PosUIManager;
 import com.floreantpos.swing.QwertyKeyPad;
+import com.floreantpos.util.CurrencyUtil;
+import com.floreantpos.util.NumberUtil;
 import com.floreantpos.util.POSUtil;
 
 public class ItemSearchDialog extends OkCancelOptionDialog {
@@ -121,10 +127,28 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 		PosScrollPane scrollPane = new PosScrollPane();
 		table = new JTable();
 		table.setRowHeight(35);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getTableHeader().setPreferredSize(PosUIManager.getSize(0, 0));
 		scrollPane.setViewportView(table);
 
-		tableModel = new BeanTableModel<MenuItem>(MenuItem.class);
+		tableModel = new BeanTableModel<MenuItem>(MenuItem.class) {
+			@Override
+			public Object getValueAt(int rowIndex, int columnIndex) {
+				int index = table.convertRowIndexToModel(rowIndex);
+				MenuItem menuItem = tableModel.getRow(index);
+				if (columnIndex == 1) {
+					return CurrencyUtil.getCurrencySymbol() + NumberUtil.formatNumber(menuItem.getPrice());
+				}
+				return super.getValueAt(rowIndex, columnIndex);
+			}
+
+			@Override
+			public Class<?> getColumnClass(int columnIndex) {
+				if (columnIndex == 1)
+					return String.class;
+				return super.getColumnClass(columnIndex);
+			}
+		};
 		tableModel.addColumn(POSConstants.NAME, MenuItem.PROP_NAME);
 		tableModel.addColumn(POSConstants.PRICE, MenuItem.PROP_PRICE);
 
@@ -138,6 +162,14 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 					return;
 				index = table.convertRowIndexToModel(index);
 				selectedItem = tableModel.getRow(index);
+			}
+		});
+		table.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+				Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				setHorizontalAlignment(SwingConstants.RIGHT);
+				return c;
 			}
 		});
 		resizeTableColumns();

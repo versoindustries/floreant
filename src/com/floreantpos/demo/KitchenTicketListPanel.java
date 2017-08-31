@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
@@ -40,15 +41,15 @@ public class KitchenTicketListPanel extends JPanel implements ComponentListener 
 
 	protected com.floreantpos.swing.PosButton btnNext;
 	protected com.floreantpos.swing.PosButton btnPrev;
-	private String kdsPrinter;
+	private List<String> kdsPrinters;
 	private int horizontalPanelCount = 4;
-	private OrderType orderType;
+	private List<OrderType> orderTypes;
 
 	public KitchenTicketListPanel() {
 		this.selectionButtonsPanel = new JPanel(new MigLayout("fillx")) { //$NON-NLS-1$
 			@Override
 			public void remove(Component comp) {
-				updateKDSView(kdsPrinter, orderType);
+				updateKDSView(kdsPrinters, orderTypes);
 			}
 		};
 		setLayout(new BorderLayout(HORIZONTAL_GAP, VERTICAL_GAP));
@@ -79,14 +80,14 @@ public class KitchenTicketListPanel extends JPanel implements ComponentListener 
 	public void checkNewKitchenTicket(KitchenTicket ticket) {
 	}
 
-	public void updateKDSView(String selectedPrinter, OrderType orderType) {
-		this.kdsPrinter = selectedPrinter;
-		this.orderType = orderType;
+	public void updateKDSView(List<String> selectedPrinters, List<OrderType> orderTypes) {
+		this.kdsPrinters = selectedPrinters;
+		this.orderTypes = orderTypes;
 		reset();
 		try {
 			dataModel.setPageSize(TerminalConfig.getKDSTicketsPerPage());
-			dataModel.setNumRows(KitchenTicketDAO.getInstance().getRowCount(selectedPrinter, orderType));
-			KitchenTicketDAO.getInstance().loadKitchenTickets(selectedPrinter, orderType, dataModel);
+			dataModel.setNumRows(KitchenTicketDAO.getInstance().getRowCount(selectedPrinters, orderTypes));
+			KitchenTicketDAO.getInstance().loadKitchenTickets(selectedPrinters, orderTypes, dataModel);
 			setDataModel(dataModel);
 		} catch (Exception e) {
 			POSMessageDialog.showError(Application.getPosWindow(), e.getMessage(), e);
@@ -222,12 +223,12 @@ public class KitchenTicketListPanel extends JPanel implements ComponentListener 
 
 	protected void scrollDown() {
 		dataModel.setCurrentRowIndex(dataModel.getNextRowIndex());
-		updateKDSView(kdsPrinter, orderType);
+		updateKDSView(kdsPrinters, orderTypes);
 	}
 
 	protected void scrollUp() {
 		dataModel.setCurrentRowIndex(dataModel.getPreviousRowIndex());
-		updateKDSView(kdsPrinter, orderType);
+		updateKDSView(kdsPrinters, orderTypes);
 	}
 
 	protected JPanel createKitchenTicket(Object item, int index) {
@@ -241,7 +242,7 @@ public class KitchenTicketListPanel extends JPanel implements ComponentListener 
 		if (!KitchenDisplayView.getInstance().isVisible())
 			return;
 		countPanels();
-		updateKDSView(kdsPrinter, orderType);
+		updateKDSView(kdsPrinters, orderTypes);
 	}
 
 	@Override

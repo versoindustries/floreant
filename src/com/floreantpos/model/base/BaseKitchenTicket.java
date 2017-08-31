@@ -1,5 +1,6 @@
 package com.floreantpos.model.base;
 
+import java.lang.Comparable;
 import java.io.Serializable;
 
 
@@ -15,16 +16,17 @@ import java.io.Serializable;
 public abstract class BaseKitchenTicket  implements Comparable, Serializable {
 
 	public static String REF = "KitchenTicket"; //$NON-NLS-1$
-	public static String PROP_PRINTER_GROUP = "printerGroup"; //$NON-NLS-1$
 	public static String PROP_STATUS = "status"; //$NON-NLS-1$
+	public static String PROP_TICKET_ID = "ticketId"; //$NON-NLS-1$
+	public static String PROP_PRINTER_NAME = "printerName"; //$NON-NLS-1$
+	public static String PROP_PRINTER_GROUP = "printerGroup"; //$NON-NLS-1$
+	public static String PROP_SERVER_NAME = "serverName"; //$NON-NLS-1$
+	public static String PROP_SEQUENCE_NUMBER = "sequenceNumber"; //$NON-NLS-1$
 	public static String PROP_CLOSING_DATE = "closingDate"; //$NON-NLS-1$
 	public static String PROP_TICKET_TYPE = "ticketType"; //$NON-NLS-1$
 	public static String PROP_ID = "id"; //$NON-NLS-1$
-	public static String PROP_VOIDED = "voided"; //$NON-NLS-1$
-	public static String PROP_SERVER_NAME = "serverName"; //$NON-NLS-1$
-	public static String PROP_SEQUENCE_NUMBER = "sequenceNumber"; //$NON-NLS-1$
 	public static String PROP_CREATE_DATE = "createDate"; //$NON-NLS-1$
-	public static String PROP_TICKET_ID = "ticketId"; //$NON-NLS-1$
+	public static String PROP_VOIDED = "voided"; //$NON-NLS-1$
 
 
 	// constructors
@@ -58,6 +60,7 @@ public abstract class BaseKitchenTicket  implements Comparable, Serializable {
 		protected java.lang.String status;
 		protected java.lang.String serverName;
 		protected java.lang.String ticketType;
+		protected java.lang.String printerName;
 
 	// many to one
 	private com.floreantpos.model.PrinterGroup printerGroup;
@@ -71,7 +74,7 @@ public abstract class BaseKitchenTicket  implements Comparable, Serializable {
 	/**
 	 * Return the unique identifier of this class
      * @hibernate.id
-     *  generator-class="identity"
+     *  generator-class="hilo"
      *  column="ID"
      */
 	public java.lang.Integer getId () {
@@ -227,6 +230,23 @@ public abstract class BaseKitchenTicket  implements Comparable, Serializable {
 
 
 	/**
+	 * Return the value associated with the column: PRINTER_NAME
+	 */
+	public java.lang.String getPrinterName () {
+					return printerName;
+			}
+
+	/**
+	 * Set the value related to the column: PRINTER_NAME
+	 * @param printerName the PRINTER_NAME value
+	 */
+	public void setPrinterName (java.lang.String printerName) {
+		this.printerName = printerName;
+	}
+
+
+
+	/**
 	 * Return the value associated with the column: PG_ID
 	 */
 	public com.floreantpos.model.PrinterGroup getPrinterGroup () {
@@ -289,7 +309,7 @@ public abstract class BaseKitchenTicket  implements Comparable, Serializable {
 		if (!(obj instanceof com.floreantpos.model.KitchenTicket)) return false;
 		else {
 			com.floreantpos.model.KitchenTicket kitchenTicket = (com.floreantpos.model.KitchenTicket) obj;
-			if (null == this.getId() || null == kitchenTicket.getId()) return false;
+			if (null == this.getId() || null == kitchenTicket.getId()) return this == obj;
 			else return (this.getId().equals(kitchenTicket.getId()));
 		}
 	}

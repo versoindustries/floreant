@@ -114,8 +114,10 @@ public class KitchenTicketView extends JPanel {
 	}
 
 	private void createHeader(KitchenTicket ticket) {
-		String printerName = ticket.getPrinters().toString();
-
+		String printerName = ticket.getPrinterName();
+		if (printerName == null) {
+			printerName = "";
+		}
 		ticketInfo = new JLabel("Ticket# " + ticket.getTicketId() + "-" + ticket.getSequenceNumber() + " " + printerName + ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		tableInfo = new JLabel();
@@ -373,7 +375,7 @@ public class KitchenTicketView extends JPanel {
 				tx = session.beginTransaction();
 				for (KitchenTicketItem kitchenTicketItem : kitchenTicket.getTicketItems()) {
 					kitchenTicketItem.setStatus(status.name());
-//Question: Do we actually need status in original ticket item?
+					//Question: Do we actually need status in original ticket item?
 					int itemCount = kitchenTicketItem.getQuantity();
 
 					for (TicketItem item : parentTicket.getTicketItems()) {

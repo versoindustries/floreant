@@ -22,7 +22,8 @@
 		<property column="SERVER_NAME" name="serverName" type="string" length="30" />
 
 		<property name="ticketType" column="TICKET_TYPE" length="20" type="string" />
-
+		<property column="PRINTER_NAME" name="printerName" type="string" length="128" />
+		
 		<bag name="tableNumbers" table="KIT_TICKET_TABLE_NUM" lazy="false" cascade="all">
 			<key column="kit_ticket_id" />
 			<element column="TABLE_ID" type="java.lang.Integer" />
