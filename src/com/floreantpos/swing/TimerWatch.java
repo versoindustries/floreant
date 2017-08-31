@@ -29,16 +29,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import net.miginfocom.swing.MigLayout;
+
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
 import com.floreantpos.config.AppConfig;
+import com.floreantpos.demo.StyledButton;
 
 public class TimerWatch extends JPanel implements ActionListener {
 
 	Timer updateTimer = new Timer(1000, this);
-	JLabel timerLabel = new JLabel();
+	StyledButton timerLabel = new StyledButton("");
 	private final Date date;
 	public Color backColor;
 	public Color textColor;
@@ -46,11 +49,14 @@ public class TimerWatch extends JPanel implements ActionListener {
 	public TimerWatch(Date date) {
 		this.date = date;
 		setOpaque(false);
+		setLayout(new MigLayout("right,ins 0"));
 
-		timerLabel.setFont(timerLabel.getFont().deriveFont(Font.BOLD, 13f));
+		backColor = Color.black;
+		textColor = Color.white;
+
+		timerLabel.setFont(timerLabel.getFont().deriveFont(Font.BOLD, 14f));
 		timerLabel.setHorizontalAlignment(JLabel.RIGHT);
-		timerLabel.setOpaque(false);
-		timerLabel.setForeground(Color.white);
+		timerLabel.setPreferredSize(PosUIManager.getSize(70, 30));
 
 		actionPerformed(null);
 

@@ -153,14 +153,14 @@ public class KitchenTicketView extends JPanel {
 
 		headerPanel = new JPanel(new MigLayout("fill", "sg, fill", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		headerPanel.setBackground(Color.black);
-		headerPanel.setForeground(Color.white);
 		headerPanel.setBorder(BorderFactory.createLineBorder(Color.white));
 		headerPanel.add(ticketInfo, "split 2"); //$NON-NLS-1$
 		ticketInfo.setFont(ticketInfo.getFont().deriveFont(Font.BOLD, 13f));
-		headerPanel.add(timerWatch, "right,wrap, span"); //$NON-NLS-1$
+		headerPanel.add(timerWatch, "right,wrap"); //$NON-NLS-1$
 		headerPanel.add(tableInfo, "split 2, grow"); //$NON-NLS-1$
 		headerPanel.add(serverInfo, "right,span"); //$NON-NLS-1$
 
+		updateHeaderView();
 		add(headerPanel, BorderLayout.NORTH);
 	}
 
