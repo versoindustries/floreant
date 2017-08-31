@@ -52,6 +52,7 @@ import com.floreantpos.extension.ExtensionManager;
 import com.floreantpos.extension.FloreantPlugin;
 import com.floreantpos.extension.InginicoPlugin;
 import com.floreantpos.extension.PaymentGatewayPlugin;
+import com.floreantpos.extension.PluginSupport;
 import com.floreantpos.model.DeliveryConfiguration;
 import com.floreantpos.model.OrderType;
 import com.floreantpos.model.PosPrinters;
@@ -265,7 +266,7 @@ public class Application {
 	}
 
 	private void initPlugins() {
-		ExtensionManager.getInstance().initialize(Main.class);
+		ExtensionManager.getInstance().initialize(PluginSupport.class);
 		List<FloreantPlugin> plugins = ExtensionManager.getPlugins();
 		for (FloreantPlugin floreantPlugin : plugins) {
 			floreantPlugin.initUI();
