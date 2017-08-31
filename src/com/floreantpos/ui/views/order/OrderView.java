@@ -971,7 +971,7 @@ public class OrderView extends ViewPanel implements PaymentListener, TicketEditL
 		}
 
 		ticketSummaryView.setVisible(true);
-
+		ticketView.setVisibleTotalButton(false);
 		ticketViewContainer.add(actionButtonPanel, BorderLayout.SOUTH);
 		add(ticketViewContainer, java.awt.BorderLayout.CENTER);
 		add(paymentView, java.awt.BorderLayout.EAST);
@@ -981,6 +981,7 @@ public class OrderView extends ViewPanel implements PaymentListener, TicketEditL
 		removeAll();
 		setVisibleButtonForOrderView();
 		ticketSummaryView.setVisible(false);
+		ticketView.setVisibleTotalButton(true);
 		add(categoryView, java.awt.BorderLayout.EAST);
 		add(ticketViewContainer, java.awt.BorderLayout.WEST);
 		add(midContainer, java.awt.BorderLayout.CENTER);

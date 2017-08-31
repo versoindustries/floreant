@@ -175,7 +175,7 @@ public class TicketView extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				ItemSearchDialog dialog = new ItemSearchDialog(Application.getPosWindow());
 				dialog.setTitle("Search item");
-				dialog.pack();
+				dialog.setSize(800, 600);
 				dialog.open();
 				if (dialog.isCanceled()) {
 					return;
@@ -307,6 +307,10 @@ public class TicketView extends JPanel {
 		});
 
 		add(btnTotal, BorderLayout.SOUTH);
+	}
+
+	public void setVisibleTotalButton(boolean b) {
+		btnTotal.setVisible(b);
 	}
 
 	private void createTicketItemControlPanel() {

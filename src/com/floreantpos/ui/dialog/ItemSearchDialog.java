@@ -31,9 +31,11 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumn;
 
 import net.miginfocom.swing.MigLayout;
 
+import com.floreantpos.Messages;
 import com.floreantpos.POSConstants;
 import com.floreantpos.main.Application;
 import com.floreantpos.model.MenuItem;
@@ -63,12 +65,10 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 	}
 
 	private void init() {
-		setResizable(false);
-
 		JPanel contentPane = getContentPanel();
 		contentPane.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
 
-		MigLayout layout = new MigLayout("inset 0"); //$NON-NLS-1$ 
+		MigLayout layout = new MigLayout("inset 0,fill"); //$NON-NLS-1$ 
 		contentPane.setLayout(layout);
 
 		tfNumber = new JTextField();
@@ -82,8 +82,8 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String searchString = tfNumber.getText();
-				if (searchString.equals("0") || searchString.equals("")) {
-					POSMessageDialog.showError(Application.getPosWindow(), "Please enter barcode or item no or name.");
+				if (searchString.equals("0") || searchString.equals("")) { //$NON-NLS-1$ //$NON-NLS-2$
+					POSMessageDialog.showError(Application.getPosWindow(), Messages.getString("ItemSearchDialog.2")); //$NON-NLS-1$
 					return;
 				}
 				List<MenuItem> menuItems = new ArrayList<>();
@@ -116,7 +116,7 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 		btnSearch.addActionListener(searchListener);
 
 		contentPane.add(tfNumber, "spanx,split 2, grow"); //$NON-NLS-1$
-		contentPane.add(btnSearch, "w 90!");
+		contentPane.add(btnSearch, "w 90!"); //$NON-NLS-1$
 
 		PosScrollPane scrollPane = new PosScrollPane();
 		table = new JTable();
@@ -126,6 +126,7 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 
 		tableModel = new BeanTableModel<MenuItem>(MenuItem.class);
 		tableModel.addColumn(POSConstants.NAME, MenuItem.PROP_NAME);
+		tableModel.addColumn(POSConstants.PRICE, MenuItem.PROP_PRICE);
 
 		table.setModel(tableModel);
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -139,15 +140,31 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 				selectedItem = tableModel.getRow(index);
 			}
 		});
-
+		resizeTableColumns();
 		QwertyKeyPad qwertyKeyPad = new QwertyKeyPad();
 
-		contentPane.add(scrollPane, "spanx,grow,h 170!,w 720!"); //$NON-NLS-1$
+		contentPane.add(scrollPane, "spanx,grow"); //$NON-NLS-1$
 		contentPane.add(qwertyKeyPad, "spanx ,grow"); //$NON-NLS-1$
+	}
+
+	private void resizeTableColumns() {
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		setColumnWidth(1, PosUIManager.getSize(90));
+	}
+
+	private void setColumnWidth(int columnNumber, int width) {
+		TableColumn column = table.getColumnModel().getColumn(columnNumber);
+		column.setPreferredWidth(width);
+		column.setMaxWidth(width);
+		column.setMinWidth(width);
 	}
 
 	@Override
 	public void doOk() {
+		if (selectedItem == null) {
+			POSMessageDialog.showMessage(Application.getPosWindow(), Messages.getString("ItemSearchDialog.4")); //$NON-NLS-1$
+			return;
+		}
 		setCanceled(false);
 		dispose();
 	}
