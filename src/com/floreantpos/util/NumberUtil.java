@@ -96,4 +96,15 @@ public class NumberUtil {
 
 		return value;
 	}
+
+	public static String formatNumber(double value, int decimalPlaces) {
+		if (decimalPlaces > 5) {
+			decimalPlaces = 5;
+		}
+		NumberFormat format = DecimalFormat.getInstance();
+		format.setMinimumFractionDigits(decimalPlaces);
+		format.setMaximumFractionDigits(decimalPlaces);
+		format.setRoundingMode(RoundingMode.HALF_UP);
+		return format.format(value);
+	}
 }
