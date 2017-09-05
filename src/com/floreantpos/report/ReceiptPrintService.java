@@ -681,9 +681,9 @@ public class ReceiptPrintService {
 
 		beginRow(currencyAmountBuilder);
 		addColumn(currencyAmountBuilder, getHtmlText("", 10, CENTER));//$NON-NLS-1$
-		addColumn(currencyAmountBuilder, getHtmlText("Net Amount", 10, CENTER));//$NON-NLS-1$
+		addColumn(currencyAmountBuilder, getHtmlText("Net Amount", 12, CENTER));//$NON-NLS-1$
 		//addColumn(currencyAmountBuilder, getHtmlText("Paid", 10, CENTER));//$NON-NLS-1$
-		addColumn(currencyAmountBuilder, getHtmlText("Due", 10, CENTER));//$NON-NLS-1$
+		addColumn(currencyAmountBuilder, getHtmlText("Due", 12, CENTER));//$NON-NLS-1$
 		endRow(currencyAmountBuilder);
 
 		beginRow(currencyAmountBuilder);
@@ -699,9 +699,9 @@ public class ReceiptPrintService {
 			double rate = currency.getExchangeRate();
 			beginRow(currencyAmountBuilder);
 			addColumn(currencyAmountBuilder, getHtmlText(key, 10, LEFT));
-			addColumn(currencyAmountBuilder, getHtmlText(decimalFormat.format(ticket.getTotalAmount() * rate), 10, RIGHT));
+			addColumn(currencyAmountBuilder, getHtmlText(decimalFormat.format(ticket.getTotalAmount() * rate), 12, RIGHT));
 			//addColumn(currencyAmountBuilder, getHtmlText(decimalFormat.format(ticket.getPaidAmount() * rate), 10, RIGHT));
-			addColumn(currencyAmountBuilder, getHtmlText(decimalFormat.format(ticket.getDueAmount() * rate), 10, RIGHT));
+			addColumn(currencyAmountBuilder, getHtmlText(decimalFormat.format(ticket.getDueAmount() * rate), 12, RIGHT));
 			endRow(currencyAmountBuilder);
 			rowCount++;
 		}
@@ -743,8 +743,8 @@ public class ReceiptPrintService {
 
 		beginRow(currencyAmountBuilder);
 		addColumn(currencyAmountBuilder, getHtmlText("", 10, CENTER));//$NON-NLS-1$
-		addColumn(currencyAmountBuilder, getHtmlText("Paid", 10, CENTER));//$NON-NLS-1$
-		addColumn(currencyAmountBuilder, getHtmlText("Cashback", 10, CENTER));//$NON-NLS-1$
+		addColumn(currencyAmountBuilder, getHtmlText("Paid", 12, CENTER));//$NON-NLS-1$
+		addColumn(currencyAmountBuilder, getHtmlText("Cashback", 12, CENTER));//$NON-NLS-1$
 		endRow(currencyAmountBuilder);
 
 		beginRow(currencyAmountBuilder);
@@ -776,8 +776,8 @@ public class ReceiptPrintService {
 				}
 				beginRow(currencyAmountBuilder);
 				addColumn(currencyAmountBuilder, getHtmlText(key, 10, LEFT));
-				addColumn(currencyAmountBuilder, getHtmlText(decimalFormat.format(paid), 10, RIGHT));
-				addColumn(currencyAmountBuilder, getHtmlText(decimalFormat.format(changeDue), 10, RIGHT));
+				addColumn(currencyAmountBuilder, getHtmlText(decimalFormat.format(paid), 12, RIGHT));
+				addColumn(currencyAmountBuilder, getHtmlText(decimalFormat.format(changeDue), 12, RIGHT));
 				endRow(currencyAmountBuilder);
 				rowCount++;
 			}
@@ -791,8 +791,8 @@ public class ReceiptPrintService {
 	}
 
 	public static String getHtmlText(String txt, int length, String align) {
-		if (txt.length() > 30) {
-			txt = txt.substring(0, 30);
+		if (txt.length() > 34) {
+			txt = txt.substring(0, 34);
 		}
 
 		if (align.equals(CENTER)) {
