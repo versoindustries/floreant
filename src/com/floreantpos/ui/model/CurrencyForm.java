@@ -44,6 +44,7 @@ import com.floreantpos.swing.IntegerTextField;
 import com.floreantpos.swing.MessageDialog;
 import com.floreantpos.ui.BeanEditor;
 import com.floreantpos.ui.dialog.POSMessageDialog;
+import com.floreantpos.util.CurrencyUtil;
 import com.floreantpos.util.POSUtil;
 
 /**
@@ -118,6 +119,7 @@ public class CurrencyForm extends BeanEditor {
 			Currency currency = (Currency) getBean();
 			CurrencyDAO dao = new CurrencyDAO();
 			dao.saveOrUpdate(currency);
+			CurrencyUtil.populateCurrency();
 		} catch (Exception e) {
 			MessageDialog.showError(e);
 			return false;
