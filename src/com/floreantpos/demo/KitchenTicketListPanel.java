@@ -52,9 +52,7 @@ public class KitchenTicketListPanel extends JPanel implements ComponentListener 
 	protected StyledButton btnNext;
 	protected StyledButton btnPrev;
 
-	private List<String> kdsPrinters;
 	private int horizontalPanelCount = 4;
-	private List<OrderType> orderTypes;
 
 	private List<String> selectedPrinters;
 	private List<OrderType> selectedOrderTypes;
@@ -163,8 +161,8 @@ public class KitchenTicketListPanel extends JPanel implements ComponentListener 
 		reset();
 		try {
 			dataModel.setPageSize(TerminalConfig.getKDSTicketsPerPage());
-			dataModel.setNumRows(KitchenTicketDAO.getInstance().getRowCount(selectedPrinters, orderTypes));
-			KitchenTicketDAO.getInstance().loadKitchenTickets(selectedPrinters, orderTypes, dataModel);
+			dataModel.setNumRows(KitchenTicketDAO.getInstance().getRowCount(selectedPrinters, selectedOrderTypes));
+			KitchenTicketDAO.getInstance().loadKitchenTickets(selectedPrinters, selectedOrderTypes, dataModel);
 			setDataModel(dataModel);
 		} catch (Exception e) {
 			POSMessageDialog.showError(Application.getPosWindow(), e.getMessage(), e);
