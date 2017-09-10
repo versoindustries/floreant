@@ -37,7 +37,7 @@
 			<many-to-many class="PizzaModifierPrice" column="PIZZAMODIFIERPRICE_ID" />
 		</bag>
 
-		<bag cascade="all,delete-orphan" inverse="true" lazy="false" name="multiplierPriceList" table="MODIFIER_MULTIPLIER_PRICE">
+		<bag cascade="all,delete-orphan" inverse="false" lazy="false" name="multiplierPriceList" table="MODIFIER_MULTIPLIER_PRICE">
 			<key column="MENUMODIFIER_ID" />
 			<one-to-many class="ModifierMultiplierPrice" />
 		</bag>
