@@ -17,34 +17,40 @@
  */
 package com.floreantpos.model.dao;
 
+import java.util.Date;
+import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import com.floreantpos.Messages;
 import com.floreantpos.PosException;
 import com.floreantpos.PosLog;
+import com.floreantpos.model.InventoryGroup;
+import com.floreantpos.model.InventoryItem;
 import com.floreantpos.model.MenuItem;
-
 
 public class InventoryItemDAO extends BaseInventoryItemDAO {
 
 	/**
 	 * Default constructor.  Can be used in place of getInstance()
 	 */
-	public InventoryItemDAO () {}
-	
+	public InventoryItemDAO() {
+	}
+
 	public boolean hasInventoryItemByName(String name) {
 		Session session = null;
 
 		try {
-			
+
 			session = getSession();
 			Criteria criteria = session.createCriteria(getReferenceClass());
 			criteria.add(Restrictions.eq(MenuItem.PROP_NAME, name));
 
 			return criteria.list().size() > 0;
-			
+
 		} catch (Exception e) {
 			PosLog.error(getClass(), e);
 			throw new PosException(Messages.getString("InventoryItemDAO.0")); //$NON-NLS-1$
@@ -54,5 +60,23 @@ public class InventoryItemDAO extends BaseInventoryItemDAO {
 			}
 		}
 
+	}
+
+	public List<InventoryItem> findItems(InventoryGroup group, Date fromDate, Date toDate) {
+		Session session = null;
+		try {
+			session = createNewSession();
+			Criteria criteria = session.createCriteria(getReferenceClass());
+
+			//			criteria.add(Restrictions.between(InventoryItem., fromDate, toDate));
+			if (group != null) {
+				criteria.add(Restrictions.eq(InventoryItem.PROP_ITEM_GROUP, group));
+			}
+
+			criteria.addOrder(Order.asc(InventoryItem.PROP_ITEM_GROUP));
+			return criteria.list();
+		} finally {
+			closeSession(session);
+		}
 	}
 }

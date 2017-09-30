@@ -32,8 +32,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 
-import net.miginfocom.swing.MigLayout;
-
 import com.floreantpos.Messages;
 import com.floreantpos.POSConstants;
 import com.floreantpos.extension.ExtensionManager;
@@ -46,6 +44,8 @@ import com.floreantpos.swing.TransparentPanel;
 import com.floreantpos.ui.BeanEditor;
 import com.floreantpos.ui.dialog.POSMessageDialog;
 import com.floreantpos.util.POSUtil;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  *
@@ -136,6 +136,9 @@ public class OrderTypeForm extends BeanEditor implements ItemListener {
 		chkShowUnitPriceInTicketGrid = new JCheckBox("Show unit price in ticket grid");
 		chkRetailOrder = new JCheckBox("Retail");
 
+		chkBarTab.addItemListener(this);
+		chkShowTableSelection.addItemListener(this);
+
 		generalPanel.setLayout(new MigLayout("", "[87px][327px,grow]", "[19px][][19px][][][21px][15px]")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		generalPanel.add(jLabel1, "cell 0 0,alignx left,aligny center"); //$NON-NLS-1$
 		generalPanel.add(tfName, "cell 1 0,growx,aligny top"); //$NON-NLS-1$
@@ -159,9 +162,9 @@ public class OrderTypeForm extends BeanEditor implements ItemListener {
 		generalPanel.add(chkBarTab, "cell 1 16,alignx left,aligny top"); //$NON-NLS-1$
 		generalPanel.add(chkPreAuthCreditCard, "cell 1 17,alignx left,aligny top"); //$NON-NLS-1$
 		generalPanel.add(chkShowPriceOnButton, "cell 1 18,alignx left,aligny top,wrap"); //$NON-NLS-1$
-		generalPanel.add(chkShowStockCountOnButton,"cell 1 19,alignx left,aligny top");
+		generalPanel.add(chkShowStockCountOnButton, "cell 1 19,alignx left,aligny top");
 		//generalPanel.add(chkShowUnitPriceInTicketGrid, "cell 1 19,alignx left,aligny top"); //$NON-NLS-1$
-		generalPanel.add(chkRetailOrder,"cell 1 20,alignx left,aligny top");
+		generalPanel.add(chkRetailOrder, "cell 1 20,alignx left,aligny top");
 
 		add(new JScrollPane(generalPanel));
 	}
@@ -217,7 +220,6 @@ public class OrderTypeForm extends BeanEditor implements ItemListener {
 
 		ordersType.setName(categoryName);
 		ordersType.setEnabled(chkEnabled.isSelected());
-		//if (!chkBarTab.isSelected()) {
 		ordersType.setShowTableSelection(chkShowTableSelection.isSelected());
 		ordersType.setShowGuestSelection(chkShowGuestSelection.isSelected());
 		ordersType.setShouldPrintToKitchen(chkShouldPrintToKitchen.isSelected());
@@ -271,6 +273,16 @@ public class OrderTypeForm extends BeanEditor implements ItemListener {
 			}
 			else {
 				chkRequiredCustomerData.setEnabled(true);
+			}
+		}
+		else if (chkBox == chkBarTab) {
+			if (chkBarTab.isSelected() && !chkShowTableSelection.isSelected()) {
+				chkShowTableSelection.setSelected(chkBarTab.isSelected());
+			}
+		}
+		else if (chkBox == chkShowTableSelection) {
+			if (chkBarTab.isSelected() && !chkShowTableSelection.isSelected()) {
+				chkBarTab.setSelected(false);
 			}
 		}
 	}

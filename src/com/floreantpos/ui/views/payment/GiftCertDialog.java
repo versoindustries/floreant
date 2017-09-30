@@ -22,8 +22,6 @@ import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.miginfocom.swing.MigLayout;
-
 import org.apache.commons.lang.StringUtils;
 
 import com.floreantpos.Messages;
@@ -32,6 +30,9 @@ import com.floreantpos.swing.FixedLengthTextField;
 import com.floreantpos.swing.QwertyKeyPad;
 import com.floreantpos.ui.dialog.OkCancelOptionDialog;
 import com.floreantpos.ui.dialog.POSMessageDialog;
+import com.floreantpos.util.POSUtil;
+
+import net.miginfocom.swing.MigLayout;
 
 public class GiftCertDialog extends OkCancelOptionDialog {
 	private FixedLengthTextField tfGiftCertNumber;
@@ -39,7 +40,7 @@ public class GiftCertDialog extends OkCancelOptionDialog {
 	private QwertyKeyPad qwertyKeyPad;
 
 	public GiftCertDialog() {
-		super();
+		super(POSUtil.getFocusedWindow());
 
 		setTitle(Messages.getString("GiftCertDialog.0")); //$NON-NLS-1$
 		setTitlePaneText(Messages.getString("GiftCertDialog.1"));

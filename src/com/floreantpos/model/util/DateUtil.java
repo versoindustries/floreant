@@ -25,6 +25,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 public class DateUtil {
+	private final static SimpleDateFormat dateFormat1 = new SimpleDateFormat("MM/dd/YYYY"); //$NON-NLS-1$
+
 	public static Date startOfDay(Date date) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
@@ -104,8 +106,8 @@ public class DateUtil {
 	}
 
 	public static boolean isSameDay(Calendar cal1, Calendar cal2) {
-		return (cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) && cal1.get(Calendar.DAY_OF_YEAR) == cal2
-				.get(Calendar.DAY_OF_YEAR));
+		return (cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
+				&& cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR));
 	}
 
 	public static String getElapsedTime(Date oldTime, Date newTime) {
@@ -148,4 +150,9 @@ public class DateUtil {
 			return "not printed yet";
 		}
 	}
+
+//	public static String getOnlyFormattedDate(Date date) {
+//		String dateString = dateFormat1.format(date);
+//		return dateString;
+//	}
 }
