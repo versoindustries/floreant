@@ -35,6 +35,7 @@ import com.floreantpos.model.CreditCardTransaction;
 import com.floreantpos.model.CurrencyBalance;
 import com.floreantpos.model.DebitCardTransaction;
 import com.floreantpos.model.DrawerPullReport;
+import com.floreantpos.model.DrawerPullVoidTicketEntry;
 import com.floreantpos.model.GiftCertificateTransaction;
 import com.floreantpos.model.Gratuity;
 import com.floreantpos.model.PayOutTransaction;
@@ -196,7 +197,7 @@ public class DrawerpullReportService {
 
 		for (Iterator iter = list.iterator(); iter.hasNext();) {
 			Ticket ticket = (Ticket) iter.next();
-			/*DrawerPullVoidTicketEntry entry = new DrawerPullVoidTicketEntry();
+			DrawerPullVoidTicketEntry entry = new DrawerPullVoidTicketEntry();
 			entry.setCode(ticket.getId());
 			entry.setAmount(ticket.getSubtotalAmount());
 			entry.setReason(ticket.getVoidReason());
@@ -207,7 +208,7 @@ public class DrawerpullReportService {
 				entry.setHast("No"); //$NON-NLS-1$
 			}
 
-			report.addVoidTicketEntry(entry);*/
+			report.addVoidTicketEntry(entry);
 
 			totalVoid += ticket.getSubtotalAmount();
 			if (ticket.isWasted()) {
