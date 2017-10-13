@@ -100,7 +100,7 @@ public class MenuGroupDAO extends BaseMenuGroupDAO {
 			//			}
 			criteria.setProjection(Projections.rowCount());
 
-			criteria.createAlias("orderTypeList", "otype", CriteriaSpecification.FULL_JOIN);
+			criteria.createAlias("orderTypeList", "otype", CriteriaSpecification.LEFT_JOIN);
 
 			DetachedCriteria subquery1 = DetachedCriteria.forClass(OrderType.class, "c1");
 			subquery1.add(Restrictions.eqProperty("otype.id", "c1.id"));
