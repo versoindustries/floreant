@@ -16,15 +16,20 @@
 		<property column="LOCATION" name="location" length="320" type="java.lang.String" />
 		<property column="FLOOR_ID" name="floorId" type="java.lang.Integer" />
 
-		<property column="CASHIER_NO" length="128" name="cashierNo" type="java.lang.String" />
+		<!-- <property column="CASHIER_NO" length="128" name="cashierNo" type="java.lang.String" />
 		<property column="RECEIPT_PRINTER_ID" length="128" name="receiptPrinterId" type="java.lang.String" />
 		<property column="VALID_FROM" name="validFrom" type="java.util.Date" />
 		<property column="VALID_TO" name="validTo" type="java.util.Date" />
 		<property column="SEQUENCE_START" name="sequenceStart" type="java.lang.Long" />
 		<property column="SEQUENCE_END" name="sequenceEnd" type="java.lang.Long" />
-		<property column="NEXT_AVAILABLE_SEQUENCE" name="nextAvailableSequence" type="java.lang.Long" />
+		<property column="NEXT_AVAILABLE_SEQUENCE" name="nextAvailableSequence" type="java.lang.Long" /> -->
 
 		<!-- Associations -->
+		<many-to-one class="ReceiptControl" lazy="false" name="receiptControl" cascade="save-update">
+			<column name="STORE_NO" />
+			<column name="CASHIER_NO" />
+			<column name="RECEIPT_PRINTER_ID" />
+		</many-to-one>
 		<many-to-one class="com.floreantpos.model.User" lazy="false" name="assignedUser">
 			<column name="ASSIGNED_USER" />
 		</many-to-one>

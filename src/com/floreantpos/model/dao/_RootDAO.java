@@ -75,6 +75,7 @@ import com.floreantpos.model.PosTransaction;
 import com.floreantpos.model.PrinterConfiguration;
 import com.floreantpos.model.PrinterGroup;
 import com.floreantpos.model.PurchaseOrder;
+import com.floreantpos.model.ReceiptControl;
 import com.floreantpos.model.Recepie;
 import com.floreantpos.model.RecepieItem;
 import com.floreantpos.model.Restaurant;
@@ -193,6 +194,7 @@ public abstract class _RootDAO extends com.floreantpos.model.dao._BaseRootDAO {
 		configuration.addClass(ModifierMultiplierPrice.class);
 		configuration.addClass(TaxGroup.class);
 		configuration.addClass(GuestCheckPrint.class);
+		configuration.addClass(ReceiptControl.class);
 
 		configureInventoryClasses(configuration);
 
