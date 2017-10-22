@@ -19,25 +19,29 @@ package com.floreantpos.ui.views.payment;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import net.miginfocom.swing.MigLayout;
-
 import com.floreantpos.Messages;
+import com.floreantpos.config.AppProperties;
 import com.floreantpos.main.Application;
 import com.floreantpos.model.Restaurant;
 import com.floreantpos.model.Ticket;
 import com.floreantpos.model.User;
+import com.floreantpos.swing.PosButton;
 import com.floreantpos.swing.PosScrollPane;
 import com.floreantpos.swing.PosUIManager;
 import com.floreantpos.ui.dialog.POSDialog;
+import com.floreantpos.ui.dialog.POSMessageDialog;
 import com.floreantpos.ui.ticket.TicketViewerTable;
 import com.floreantpos.ui.ticket.TicketViewerTableChangeListener;
 import com.floreantpos.ui.views.order.OrderController;
@@ -45,6 +49,8 @@ import com.floreantpos.ui.views.order.OrderView;
 import com.floreantpos.util.CurrencyUtil;
 import com.floreantpos.util.NumberUtil;
 import com.floreantpos.util.POSUtil;
+
+import net.miginfocom.swing.MigLayout;
 
 //TODO: REVISE CODE
 public class SettleTicketDialog extends POSDialog implements PaymentListener, TicketViewerTableChangeListener {
@@ -65,6 +71,7 @@ public class SettleTicketDialog extends POSDialog implements PaymentListener, Ti
 	private JTextField tfTotal;
 	private JTextField tfGratuity;
 	private SettleTicketProcessor ticketProcessor = null;
+	private PosButton btnUpdateServiceCharge;
 
 	public SettleTicketDialog(Ticket ticket, User currentUser) {
 		super();
@@ -122,8 +129,8 @@ public class SettleTicketDialog extends POSDialog implements PaymentListener, Ti
 		else {
 			tfTax.setText(NumberUtil.formatNumber(ticket.getTaxAmount()));
 		}
-		if (ticket.getGratuity() != null) {
-			tfGratuity.setText(NumberUtil.formatNumber(ticket.getGratuity().getAmount()));
+		if (ticket.getServiceCharge() != null) {
+			tfGratuity.setText(NumberUtil.formatNumber(ticket.getServiceCharge()));
 		}
 		else {
 			tfGratuity.setText("0.00"); //$NON-NLS-1$
@@ -307,6 +314,17 @@ public class SettleTicketDialog extends POSDialog implements PaymentListener, Ti
 		tfTotal.setHorizontalAlignment(SwingConstants.TRAILING);
 		tfTotal.setEditable(false);
 
+		btnUpdateServiceCharge = new PosButton();
+		btnUpdateServiceCharge.setText("...");
+		btnUpdateServiceCharge.setHorizontalAlignment(SwingConstants.CENTER);
+		btnUpdateServiceCharge.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doUpdateServiceCharge();
+			}
+		});
+
 		JPanel ticketAmountPanel = new com.floreantpos.swing.TransparentPanel(new MigLayout("hidemode 3,ins 2 2 3 2,alignx trailing,fill", "[grow]2[]", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		ticketAmountPanel.add(lblSubtotal, "growx,aligny center"); //$NON-NLS-1$
@@ -320,6 +338,7 @@ public class SettleTicketDialog extends POSDialog implements PaymentListener, Ti
 			ticketAmountPanel.add(tfDeliveryCharge, "growx,aligny center"); //$NON-NLS-1$
 		}
 		ticketAmountPanel.add(lblGratuity, "newline,growx,aligny center"); //$NON-NLS-1$
+		ticketAmountPanel.add(btnUpdateServiceCharge, "w 25!, h 23!, aligny center, split 2"); //$NON-NLS-1$
 		ticketAmountPanel.add(tfGratuity, "growx,aligny center"); //$NON-NLS-1$
 		ticketAmountPanel.add(lblTotal, "newline,growx,aligny center"); //$NON-NLS-1$
 		ticketAmountPanel.add(tfTotal, "growx,aligny center"); //$NON-NLS-1$
@@ -378,6 +397,41 @@ public class SettleTicketDialog extends POSDialog implements PaymentListener, Ti
 
 	public SettleTicketProcessor getTicketProcessor() {
 		return ticketProcessor;
+	}
+
+	private void doUpdateServiceCharge() {
+		try {
+			int option = POSMessageDialog.showYesNoQuestionDialog(POSUtil.getFocusedWindow(), "Are you sure to edit service charge?", "Edit service charge");
+
+			if (option != JOptionPane.YES_OPTION) {
+				return;
+			}
+			GratuityInputDialog d = new GratuityInputDialog();
+			d.setTitle(AppProperties.getAppName());
+			d.setAmount(ticket.getServiceCharge());
+			d.setTitlePaneText("Enter service charge amount: ");
+			d.pack();
+			d.setResizable(false);
+			d.open();
+
+			if (d.isCanceled()) {
+				return;
+			}
+
+			double serviceCharge = d.getGratuityAmount();
+			ticket.setCalculateServiceCharge(false);
+			ticket.setServiceCharge(serviceCharge);
+
+			ticket.calculatePrice();
+			OrderController.saveOrder(ticket);
+			if (OrderView.getInstance().isVisible()) {
+				OrderView.getInstance().setCurrentTicket(ticket);
+			}
+			updateView();
+			paymentView.updateView();
+		} catch (Exception e1) {
+			POSMessageDialog.showError(POSUtil.getFocusedWindow(), e1.getMessage(), e1);
+		}
 	}
 
 }

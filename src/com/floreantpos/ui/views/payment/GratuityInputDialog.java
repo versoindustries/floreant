@@ -22,14 +22,14 @@ import java.awt.Font;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import net.miginfocom.swing.MigLayout;
-
 import com.floreantpos.Messages;
 import com.floreantpos.swing.DoubleTextField;
 import com.floreantpos.swing.NumericKeypad;
 import com.floreantpos.swing.PosUIManager;
 import com.floreantpos.ui.dialog.OkCancelOptionDialog;
 import com.floreantpos.util.POSUtil;
+
+import net.miginfocom.swing.MigLayout;
 
 public class GratuityInputDialog extends OkCancelOptionDialog {
 	private DoubleTextField doubleTextField;
@@ -57,6 +57,10 @@ public class GratuityInputDialog extends OkCancelOptionDialog {
 	public void doOk() {
 		setCanceled(false);
 		dispose();
+	}
+
+	public void setAmount(double amount) {
+		doubleTextField.setText(String.valueOf(amount));
 	}
 
 	public double getGratuityAmount() {

@@ -626,7 +626,9 @@ public class Ticket extends BaseTicket {
 		/*if (getType() != OrderType.DINE_IN) {
 			return 0;
 		}*/
-
+		if (!isCalculateServiceCharge()) {
+			return getServiceCharge();
+		}
 		Restaurant restaurant = Application.getInstance().getRestaurant();
 		double serviceChargePercentage = restaurant.getServiceChargePercentage();
 
