@@ -65,7 +65,17 @@ public class TimerWatch extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Interval interval = new Interval(date.getTime(), new Instant().getMillis());
+		long currentTimeMillis = new Instant().getMillis();
+		long createTimeMillis = date.getTime();
+		long diff = createTimeMillis - currentTimeMillis;
+		
+		Interval interval = null;
+		if (diff > 0) {
+			interval = new Interval(currentTimeMillis, date.getTime());
+		}
+		else {
+			interval = new Interval(date.getTime(), currentTimeMillis);
+		}
 		Duration duration = interval.toDuration();
 
 		int timeOutValueYellow = 300;
