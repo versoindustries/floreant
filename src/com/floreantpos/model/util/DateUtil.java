@@ -26,6 +26,7 @@ import org.joda.time.Interval;
 
 public class DateUtil {
 	private final static SimpleDateFormat dateFormat1 = new SimpleDateFormat("MM/dd/YYYY"); //$NON-NLS-1$
+	private final static SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd MMM yy");
 
 	public static Date startOfDay(Date date) {
 		Calendar cal = Calendar.getInstance();
@@ -35,6 +36,10 @@ public class DateUtil {
 		cal.set(Calendar.SECOND, 0);
 
 		return new Date(cal.getTimeInMillis());
+	}
+	public static String formatFullDateAsString(Date date) {
+		String dateString = dateFormat2.format(date);
+		return dateString;
 	}
 
 	public static Date endOfDay(Date date) {

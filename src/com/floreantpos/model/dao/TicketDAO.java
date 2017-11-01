@@ -35,6 +35,7 @@ import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.ResultTransformer;
+import org.hibernate.transform.Transformers;
 
 import com.floreantpos.Messages;
 import com.floreantpos.POSConstants;
@@ -1289,6 +1290,35 @@ public class TicketDAO extends BaseTicketDAO {
 			tableModel.setRows(criteria.list());
 			return;
 
+		} finally {
+			closeSession(session);
+		}
+	}
+
+	public List<Ticket> getAssignDriverTickets(Date fromDate, Date toDate, User user) {
+		Session session = null;
+		Criteria criteria = null;
+		try {
+			session = createNewSession();
+			criteria = session.createCriteria(Ticket.class);
+			criteria.add(Restrictions.between(Ticket.PROP_CREATE_DATE, fromDate, toDate));
+			if (user != null) {
+				criteria.add(Restrictions.eq(Ticket.PROP_ASSIGNED_DRIVER, user));
+			}
+			else {
+				criteria.add(Restrictions.isNotNull(Ticket.PROP_ASSIGNED_DRIVER));
+			}
+			ProjectionList pList = Projections.projectionList();
+			pList.add(Projections.property(Ticket.PROP_ID), Ticket.PROP_ID);
+			pList.add(Projections.property(Ticket.PROP_DELIVERY_DATE), Ticket.PROP_DELIVERY_DATE);
+			pList.add(Projections.property(Ticket.PROP_TOTAL_AMOUNT), Ticket.PROP_TOTAL_AMOUNT);
+			pList.add(Projections.property(Ticket.PROP_CUSTOMER_ID), Ticket.PROP_CUSTOMER_ID);
+			criteria.setProjection(pList);
+
+			criteria.setResultTransformer(Transformers.aliasToBean(Ticket.class));
+			criteria.addOrder(Order.asc(Ticket.PROP_ID));
+			List<Ticket> list = criteria.list();
+			return list;
 		} finally {
 			closeSession(session);
 		}

@@ -37,6 +37,7 @@ import org.apache.commons.lang.StringUtils;
 import com.floreantpos.Messages;
 import com.floreantpos.main.Application;
 import com.floreantpos.model.base.BaseTicket;
+import com.floreantpos.model.dao.CustomerDAO;
 import com.floreantpos.model.dao.MenuItemDAO;
 import com.floreantpos.model.dao.OrderTypeDAO;
 import com.floreantpos.model.dao.ShopTableDAO;
@@ -71,6 +72,7 @@ public class Ticket extends BaseTicket {
 
 	private OrderType orderType;
 	private String diffWithCrntTime;
+	private Customer customer;
 
 	/* [CONSTRUCTOR MARKER BEGIN] */
 	public Ticket() {
@@ -874,4 +876,17 @@ public class Ticket extends BaseTicket {
 	public void setDiffWithCrntTime(String diffWithCrntTime) {
 		this.diffWithCrntTime = diffWithCrntTime;
 	}
+
+	public Customer getCustomer() {
+		if (this.customer != null) {
+			return this.customer;
+		}
+		Integer customerId = getCustomerId();
+		if (customerId == null) {
+			return null;
+		}
+		customer = CustomerDAO.getInstance().get(customerId);
+		return customer;
+	}
+
 }
