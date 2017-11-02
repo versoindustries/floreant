@@ -27,6 +27,7 @@ import org.joda.time.Interval;
 public class DateUtil {
 	private final static SimpleDateFormat dateFormat1 = new SimpleDateFormat("MM/dd/YYYY"); //$NON-NLS-1$
 	private final static SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd MMM yy");
+	private final static SimpleDateFormat dateFormat3 = new SimpleDateFormat("dd MMM yy hh:mm a");
 
 	public static Date startOfDay(Date date) {
 		Calendar cal = Calendar.getInstance();
@@ -37,8 +38,14 @@ public class DateUtil {
 
 		return new Date(cal.getTimeInMillis());
 	}
+
 	public static String formatFullDateAsString(Date date) {
 		String dateString = dateFormat2.format(date);
+		return dateString;
+	}
+
+	public static String formatFullDateAndTimeAsString(Date date) {
+		String dateString = dateFormat3.format(date);
 		return dateString;
 	}
 
@@ -156,8 +163,8 @@ public class DateUtil {
 		}
 	}
 
-//	public static String getOnlyFormattedDate(Date date) {
-//		String dateString = dateFormat1.format(date);
-//		return dateString;
-//	}
+	//	public static String getOnlyFormattedDate(Date date) {
+	//		String dateString = dateFormat1.format(date);
+	//		return dateString;
+	//	}
 }

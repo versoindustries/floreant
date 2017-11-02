@@ -34,6 +34,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+//import org.hibernate.sql.JoinType;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
 
@@ -41,6 +42,7 @@ import com.floreantpos.Messages;
 import com.floreantpos.POSConstants;
 import com.floreantpos.main.Application;
 import com.floreantpos.model.DataUpdateInfo;
+import com.floreantpos.model.DriverSalesReportData;
 import com.floreantpos.model.Gratuity;
 import com.floreantpos.model.InventoryItem;
 import com.floreantpos.model.InventoryTransaction;
@@ -1295,7 +1297,7 @@ public class TicketDAO extends BaseTicketDAO {
 		}
 	}
 
-	public List<Ticket> getAssignDriverTickets(Date fromDate, Date toDate, User user) {
+	public List<Ticket> getAssignDetailDriverTickets(Date fromDate, Date toDate, User user) {
 		Session session = null;
 		Criteria criteria = null;
 		try {
@@ -1312,6 +1314,7 @@ public class TicketDAO extends BaseTicketDAO {
 			pList.add(Projections.property(Ticket.PROP_ID), Ticket.PROP_ID);
 			pList.add(Projections.property(Ticket.PROP_DELIVERY_DATE), Ticket.PROP_DELIVERY_DATE);
 			pList.add(Projections.property(Ticket.PROP_TOTAL_AMOUNT), Ticket.PROP_TOTAL_AMOUNT);
+			pList.add(Projections.property(Ticket.PROP_GRATUITY), Ticket.PROP_GRATUITY);
 			pList.add(Projections.property(Ticket.PROP_CUSTOMER_ID), Ticket.PROP_CUSTOMER_ID);
 			criteria.setProjection(pList);
 
@@ -1319,6 +1322,49 @@ public class TicketDAO extends BaseTicketDAO {
 			criteria.addOrder(Order.asc(Ticket.PROP_ID));
 			List<Ticket> list = criteria.list();
 			return list;
+		} finally {
+			closeSession(session);
+		}
+	}
+
+	public List<DriverSalesReportData> getAssignDriverTickets(Date fromDate, Date toDate) {
+		Session session = null;
+		Criteria criteria = null;
+		Criteria criteria2 = null;
+		try {
+			session = createNewSession();
+			criteria = session.createCriteria(Ticket.class);
+			criteria.add(Restrictions.between(Ticket.PROP_CREATE_DATE, fromDate, toDate));
+			criteria.add(Restrictions.isNotNull(Ticket.PROP_ASSIGNED_DRIVER));
+
+			ProjectionList pList = Projections.projectionList();
+			pList.add(Projections.distinct(Projections.property(Ticket.PROP_ASSIGNED_DRIVER)));
+			criteria.setProjection(pList);
+
+			List<User> list = criteria.list();
+			List<DriverSalesReportData> objects = new ArrayList<>();
+			for (User user : list) {
+				criteria2 = session.createCriteria(Ticket.class, "t");
+				criteria2.createAlias("t." + Ticket.PROP_GRATUITY, "g");
+				criteria2.add(Restrictions.eq("assignedDriver", user));
+				ProjectionList projections = Projections.projectionList();
+				//				projections.add(Projections.property(user.getUserId().toString()));
+				//				projections.add(Projections.property(user.getFullName().toString()));
+				projections.add(Projections.sum("t.totalAmount"));
+				projections.add(Projections.sum("g.amount"));
+				projections.add(Projections.count("t.id"));
+				criteria2.setProjection(projections);
+				List list2 = criteria2.list();
+				DriverSalesReportData data = new DriverSalesReportData();
+				data.setDriverId(String.valueOf(user.getUserId()));
+				data.setDriverName(user.getFullName());
+				data.setTotalSales(new Double(list2.get(0).toString()));
+				data.setTotalGratuity(new Double(list2.get(1).toString()));
+				data.setTotalOrder(new Double(list2.get(2).toString()));
+				objects.add(data);
+			}
+
+			return objects;
 		} finally {
 			closeSession(session);
 		}
