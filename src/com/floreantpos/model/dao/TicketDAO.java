@@ -1297,6 +1297,7 @@ public class TicketDAO extends BaseTicketDAO {
 		}
 	}
 
+	//Method for getting DriverDetailSalesReport data
 	public List<Ticket> getAssignDetailDriverTickets(Date fromDate, Date toDate, User user) {
 		Session session = null;
 		Criteria criteria = null;
@@ -1327,7 +1328,8 @@ public class TicketDAO extends BaseTicketDAO {
 		}
 	}
 
-	public List<DriverSalesReportData> getAssignDriverTickets(Date fromDate, Date toDate) {
+	//Method for getting DriverSalesReport data
+	public List<DriverSalesReportData> getDriverSalesReportDataList(Date fromDate, Date toDate) {
 		Session session = null;
 		Criteria criteria = null;
 		Criteria criteria2 = null;
@@ -1341,30 +1343,35 @@ public class TicketDAO extends BaseTicketDAO {
 			pList.add(Projections.distinct(Projections.property(Ticket.PROP_ASSIGNED_DRIVER)));
 			criteria.setProjection(pList);
 
-			List<User> list = criteria.list();
-			List<DriverSalesReportData> objects = new ArrayList<>();
-			for (User user : list) {
+			List<User> userList = criteria.list();
+			List<DriverSalesReportData> reportDatas = new ArrayList<>();
+			for (User user : userList) {
 				criteria2 = session.createCriteria(Ticket.class, "t");
 				criteria2.createAlias("t." + Ticket.PROP_GRATUITY, "g");
-				criteria2.add(Restrictions.eq("assignedDriver", user));
+				criteria2.add(Restrictions.eq(Ticket.PROP_ASSIGNED_DRIVER, user));
+
 				ProjectionList projections = Projections.projectionList();
-				//				projections.add(Projections.property(user.getUserId().toString()));
-				//				projections.add(Projections.property(user.getFullName().toString()));
-				projections.add(Projections.sum("t.totalAmount"));
-				projections.add(Projections.sum("g.amount"));
-				projections.add(Projections.count("t.id"));
+				projections.add(Projections.sum("t." + Ticket.PROP_TOTAL_AMOUNT));
+				projections.add(Projections.sum("g." + Gratuity.PROP_AMOUNT));
+				projections.add(Projections.count("t." + Ticket.PROP_ID));
+
 				criteria2.setProjection(projections);
 				List list2 = criteria2.list();
+
 				DriverSalesReportData data = new DriverSalesReportData();
+
+				Object[] obj = (Object[]) list2.get(0);
+
 				data.setDriverId(String.valueOf(user.getUserId()));
 				data.setDriverName(user.getFullName());
-				data.setTotalSales(new Double(list2.get(0).toString()));
-				data.setTotalGratuity(new Double(list2.get(1).toString()));
-				data.setTotalOrder(new Double(list2.get(2).toString()));
-				objects.add(data);
+				data.setTotalSales(new Double(obj[0].toString()));
+				data.setTotalGratuity(new Double(obj[1].toString()));
+				data.setTotalOrder(new Double(obj[2].toString()));
+
+				reportDatas.add(data);
 			}
 
-			return objects;
+			return reportDatas;
 		} finally {
 			closeSession(session);
 		}
