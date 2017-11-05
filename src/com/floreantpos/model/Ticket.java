@@ -50,14 +50,6 @@ import com.floreantpos.util.POSUtil;
 public class Ticket extends BaseTicket {
 
 	private static final long serialVersionUID = 1L;
-	// public final static int TAKE_OUT = -1;
-
-	//	public final static String DINE_IN = "DINE IN";
-	//	public final static String TAKE_OUT = "TAKE OUT";
-	//	public final static String PICKUP = "PICKUP";
-	//	public final static String HOME_DELIVERY = "HOME DELIVERY";
-	//	public final static String DRIVE_THROUGH = "DRIVE THRU";
-	//	public final static String BAR_TAB = "BAR_TAB";
 
 	public final static String PROPERTY_CARD_TRANSACTION_ID = "card_transaction_id"; //$NON-NLS-1$
 	public final static String PROPERTY_CARD_TRACKS = "card_tracks"; //$NON-NLS-1$
