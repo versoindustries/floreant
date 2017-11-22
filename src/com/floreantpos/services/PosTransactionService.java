@@ -63,7 +63,6 @@ public class PosTransactionService {
 
 			ticket.setVoided(false);
 			ticket.setDrawerResetted(false);
-			ticket.setTerminal(terminal);
 			ticket.setPaidAmount(ticket.getPaidAmount() + transaction.getAmount());
 
 			ticket.calculatePrice();
@@ -145,7 +144,6 @@ public class PosTransactionService {
 
 			ticket.setVoided(false);
 			ticket.setDrawerResetted(false);
-			ticket.setTerminal(terminal);
 			ticket.setPaidAmount(ticket.getPaidAmount() + transaction.getAmount());
 
 			ticket.calculatePrice();

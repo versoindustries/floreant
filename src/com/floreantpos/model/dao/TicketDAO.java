@@ -116,6 +116,7 @@ public class TicketDAO extends BaseTicketDAO {
 
 		adjustStockAmount(ticket, session);
 		updateShopTableStatus(ticket, session);
+		ticket.setTerminal(Application.getInstance().getTerminal());
 		session.saveOrUpdate(ticket);
 
 		ticket.clearDeletedItems();
