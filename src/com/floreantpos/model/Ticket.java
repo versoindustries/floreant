@@ -266,7 +266,7 @@ public class Ticket extends BaseTicket {
 		double toleranceAmount = calculateToleranceAmount();
 		double ticketDiscountAmount = calculateTicketDiscountAmount(discountAmount);
 		if (ticketDiscountAmount > 0) {
-			discountAmount = ticketDiscountAmount;
+			discountAmount += ticketDiscountAmount;
 		}
 
 		setSubtotalAmount(subtotalAmount);
@@ -402,7 +402,7 @@ public class Ticket extends BaseTicket {
 		}
 		TicketDiscount ticketCouponAndDiscount = DiscountUtil.getMaxDiscount(discounts, itemsDiscount);
 		if (ticketCouponAndDiscount != null) {
-			discount = DiscountUtil.calculateDiscountAmount(getSubtotalAmount() - discount, ticketCouponAndDiscount);
+			discount = DiscountUtil.calculateDiscountAmount(getSubtotalAmount() - itemsDiscount, ticketCouponAndDiscount);
 		}
 		discount = fixInvalidAmount(discount);
 		return NumberUtil.roundToTwoDigit(discount);
