@@ -42,6 +42,7 @@ import com.floreantpos.model.Discount;
 import com.floreantpos.model.DrawerAssignedHistory;
 import com.floreantpos.model.DrawerPullReport;
 import com.floreantpos.model.EmployeeInOutHistory;
+import com.floreantpos.model.GiftCard;
 import com.floreantpos.model.GlobalConfig;
 import com.floreantpos.model.Gratuity;
 import com.floreantpos.model.GuestCheckPrint;
@@ -195,6 +196,7 @@ public abstract class _RootDAO extends com.floreantpos.model.dao._BaseRootDAO {
 		configuration.addClass(TaxGroup.class);
 		configuration.addClass(GuestCheckPrint.class);
 		configuration.addClass(ReceiptControl.class);
+		configuration.addClass(GiftCard.class);
 
 		configureInventoryClasses(configuration);
 

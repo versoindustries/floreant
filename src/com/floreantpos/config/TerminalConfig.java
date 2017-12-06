@@ -100,6 +100,16 @@ public class TerminalConfig {
 
 	private static final String KDS_TICKETS_PER_PAGE = "kds.ticket.per_page";
 
+	private static final String GIVEX_USER_ID = "givex.user.id";
+	private static final String GIVEX_USER_PASSWORD = "givex.user.password";
+	private static final String GIVEX_PRIM_HOST_ADDRESS = "givex.pri.host.address";
+	private static final String GIVEX_PRIM_HOST_PORT = "givex.pri.host.port";
+	private static final String GIVEX_SEC_HOST_ADDRESS = "givex.sec.host.address";
+	private static final String GIVEX_SEC_HOST_PORT = "givex.sec.host.port";
+	private static final String GIVEX_TIME_OUT = "givex.timeup";
+	private static final String GIVEX_IS_SANDBOX = "givex.sandbox";
+	private static final String GIVEX_GATEWAY = "givex.gateway";
+
 	private static PropertiesConfiguration config = AppConfig.getConfig();
 
 	public static int getTerminalId() {
@@ -543,4 +553,79 @@ public class TerminalConfig {
 	public static int getKDSTicketsPerPage() {
 		return config.getInt(KDS_TICKETS_PER_PAGE, 4);
 	}
+
+	// GIVEX PROPERTIES
+
+	public static void setGivexUserId(String userId) {
+		config.setProperty(GIVEX_USER_ID, userId);
+	}
+
+	public static String getGivexUserId() {
+		return config.getString(GIVEX_USER_ID);
+	}
+
+	public static void setGivexUserPassword(String userPassword) {
+		config.setProperty(GIVEX_USER_PASSWORD, userPassword);
+	}
+
+	public static String getGivexUserPassword() {
+		return config.getString(GIVEX_USER_PASSWORD);
+	}
+
+	public static void setGivexPriHostAddress(String address) {
+		config.setProperty(GIVEX_PRIM_HOST_ADDRESS, address);
+	}
+
+	public static String getGivexPriHostAddress() {
+		return config.getString(GIVEX_PRIM_HOST_ADDRESS);
+	}
+
+	public static void setGivexPriHostPort(String port) {
+		config.setProperty(GIVEX_PRIM_HOST_PORT, port);
+	}
+
+	public static String getGivexPriHostAPort() {
+		return config.getString(GIVEX_PRIM_HOST_PORT);
+	}
+
+	public static void setGivexSecHostAddress(String address) {
+		config.setProperty(GIVEX_SEC_HOST_ADDRESS, address);
+	}
+
+	public static String getGivexSecHostAddress() {
+		return config.getString(GIVEX_SEC_HOST_ADDRESS);
+	}
+
+	public static void setGivexSecHostPort(String port) {
+		config.setProperty(GIVEX_SEC_HOST_PORT, port);
+	}
+
+	public static String getGivexSecHostAPort() {
+		return config.getString(GIVEX_SEC_HOST_PORT);
+	}
+
+	public static void setGivexTimeup(int time) {
+		config.setProperty(GIVEX_TIME_OUT, time);
+	}
+
+	public static int getGivexTimeup() {
+		return config.getInt(GIVEX_TIME_OUT, 30);
+	}
+
+	public static void setGivexSandboxMode(boolean sandboxMode) {
+		config.setProperty(GIVEX_IS_SANDBOX, sandboxMode);
+	}
+
+	public static boolean getGivexSandboxMode() {
+		return config.getBoolean(GIVEX_IS_SANDBOX, true);
+	}
+
+	public static void setGivexGetwayId(String id) {
+		config.setProperty(GIVEX_GATEWAY, id);
+	}
+
+	public static String getGivexGetwayId() {
+		return config.getString(GIVEX_GATEWAY);
+	}
+
 }

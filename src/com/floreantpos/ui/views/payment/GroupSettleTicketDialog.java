@@ -44,6 +44,9 @@ import com.floreantpos.PosException;
 import com.floreantpos.PosLog;
 import com.floreantpos.config.CardConfig;
 import com.floreantpos.config.TerminalConfig;
+import com.floreantpos.extension.ExtensionManager;
+import com.floreantpos.extension.FloreantPlugin;
+import com.floreantpos.extension.GiftCardPaymentPlugin;
 import com.floreantpos.extension.InginicoPlugin;
 import com.floreantpos.extension.PaymentGatewayPlugin;
 import com.floreantpos.main.Application;
@@ -425,24 +428,23 @@ public class GroupSettleTicketDialog extends POSDialog implements CardInputListe
 					transaction.setPaymentType(PaymentType.GIFT_CERTIFICATE.name());
 					transaction.setCaptured(true);
 
-					double giftCertFaceValue = giftCertDialog.getGiftCertFaceValue();
 					double giftCertCashBackAmount = 0;
-					transaction.setTenderAmount(giftCertFaceValue);
+					transaction.setTenderAmount(totalTenderAmount);
 
-					if (giftCertFaceValue >= totalDueAmount) {
+					if (totalTenderAmount >= totalDueAmount) {
 						transaction.setAmount(totalDueAmount);
-						giftCertCashBackAmount = giftCertFaceValue - totalDueAmount;
+						giftCertCashBackAmount = totalTenderAmount - totalDueAmount;
 					}
 					else {
-						transaction.setAmount(giftCertFaceValue);
+						transaction.setAmount(totalTenderAmount);
 					}
 
 					transaction.setGiftCertNumber(giftCertDialog.getGiftCertNumber());
-					transaction.setGiftCertFaceValue(giftCertFaceValue);
+					transaction.setGiftCertFaceValue(totalTenderAmount);
 					transaction.setGiftCertPaidAmount(transaction.getAmount());
 					transaction.setGiftCertCashBackAmount(giftCertCashBackAmount);
 
-					settleTicket(transaction);
+					payUsingGiftCard(transaction);
 					break;
 
 				default:
@@ -452,6 +454,42 @@ public class GroupSettleTicketDialog extends POSDialog implements CardInputListe
 		} catch (Exception e) {
 			PosLog.error(getClass(), e);
 		}
+	}
+	
+	private void payUsingGiftCard(PosTransaction transaction) {
+		try {
+			System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
+
+			GiftCardPaymentPlugin giftCardPaymentPlugin = getGiftCardPaymentPlugin();
+			GiftCardProcessor giftCardProcessor = giftCardPaymentPlugin.getProcessor();
+			transaction.setCardMerchantGateway(giftCardPaymentPlugin.getProductName());
+			giftCardProcessor.chargeAmount(transaction);
+
+			settleTicket(transaction);
+		} catch (PosException e) {
+			POSMessageDialog.showError(POSUtil.getFocusedWindow(), e.getMessage(), e);
+		} catch (Exception e) {
+			POSMessageDialog.showError(POSUtil.getFocusedWindow(), e.getMessage(), e);
+		}
+	}
+	
+	private GiftCardPaymentPlugin getGiftCardPaymentPlugin() {
+		String givexGetwayId = TerminalConfig.getGivexGetwayId();
+		GiftCardPaymentPlugin selectedGivexPlugin = null;
+
+		List<FloreantPlugin> plugins = ExtensionManager.getPlugins(GiftCardPaymentPlugin.class);
+
+		for (FloreantPlugin plugin : plugins) {
+			if (plugin instanceof GiftCardPaymentPlugin) {
+				GiftCardPaymentPlugin givexPlugin = (GiftCardPaymentPlugin) plugin;
+				if (givexPlugin.getId().equals(givexGetwayId)) {
+					selectedGivexPlugin = givexPlugin;
+					return selectedGivexPlugin;
+				}
+
+			}
+		}
+		return selectedGivexPlugin;
 	}
 
 	private boolean confirmPayment() {

@@ -76,7 +76,7 @@ public class SettleTicketDialog extends POSDialog implements PaymentListener, Ti
 	public SettleTicketDialog(Ticket ticket, User currentUser) {
 		super();
 		this.ticket = ticket;
-		ticketProcessor = new SettleTicketProcessor(currentUser);
+		ticketProcessor = new SettleTicketProcessor();
 		if (ticket.getOrderType().isConsolidateItemsInReceipt()) {
 			ticket.consolidateTicketItems();
 		}

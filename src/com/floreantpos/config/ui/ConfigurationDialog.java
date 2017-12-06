@@ -62,6 +62,7 @@ public class ConfigurationDialog extends POSDialog implements ChangeListener, Ac
 		addView(new TerminalConfigurationView());
 		addView(new PrintConfigurationView());
 		addView(new CardConfigurationView());
+		addView(new GiftCardConfigurationView());
 		addView(new DatabaseConfigurationView());
 		addView(new TaxConfigurationView());
 		addView(new PeripheralConfigurationView());

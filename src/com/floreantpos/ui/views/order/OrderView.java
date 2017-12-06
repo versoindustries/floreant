@@ -100,7 +100,7 @@ import com.floreantpos.util.POSUtil;
  */
 public class OrderView extends ViewPanel implements PaymentListener, TicketEditListener {
 	private HashMap<String, JComponent> views = new HashMap<String, JComponent>();
-	private SettleTicketProcessor ticketProcessor = new SettleTicketProcessor(Application.getCurrentUser());
+	private SettleTicketProcessor ticketProcessor = new SettleTicketProcessor();
 	public final static String VIEW_NAME = "ORDER_VIEW"; //$NON-NLS-1$
 	private static OrderView instance;
 

@@ -18,6 +18,8 @@
 package com.floreantpos.ui.views.payment;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,7 +27,6 @@ import javax.swing.JPanel;
 import org.apache.commons.lang.StringUtils;
 
 import com.floreantpos.Messages;
-import com.floreantpos.swing.DoubleTextField;
 import com.floreantpos.swing.FixedLengthTextField;
 import com.floreantpos.swing.QwertyKeyPad;
 import com.floreantpos.ui.dialog.OkCancelOptionDialog;
@@ -36,7 +37,6 @@ import net.miginfocom.swing.MigLayout;
 
 public class GiftCertDialog extends OkCancelOptionDialog {
 	private FixedLengthTextField tfGiftCertNumber;
-	private DoubleTextField tfFaceValue;
 	private QwertyKeyPad qwertyKeyPad;
 
 	public GiftCertDialog() {
@@ -54,14 +54,14 @@ public class GiftCertDialog extends OkCancelOptionDialog {
 
 		tfGiftCertNumber = new FixedLengthTextField();
 		tfGiftCertNumber.setLength(64);
+		tfGiftCertNumber.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doOk();
+			}
+		});
 		panel.add(tfGiftCertNumber, "cell 1 0,growx"); //$NON-NLS-1$
-
-		JLabel lblFaceValue = new JLabel(Messages.getString("GiftCertDialog.8")); //$NON-NLS-1$
-		panel.add(lblFaceValue, "cell 0 1,alignx trailing"); //$NON-NLS-1$
-
-		tfFaceValue = new DoubleTextField();
-		tfFaceValue.setText("50"); //$NON-NLS-1$
-		panel.add(tfFaceValue, "cell 1 1,growx"); //$NON-NLS-1$
 
 		qwertyKeyPad = new QwertyKeyPad();
 		panel.add(qwertyKeyPad, "newline, gaptop 10px, span"); //$NON-NLS-1$
@@ -74,11 +74,6 @@ public class GiftCertDialog extends OkCancelOptionDialog {
 			return;
 		}
 
-		if (getGiftCertFaceValue() <= 0) {
-			POSMessageDialog.showMessage(Messages.getString("GiftCertDialog.15")); //$NON-NLS-1$
-			return;
-		}
-
 		setCanceled(false);
 		dispose();
 	}
@@ -87,7 +82,4 @@ public class GiftCertDialog extends OkCancelOptionDialog {
 		return tfGiftCertNumber.getText();
 	}
 
-	public double getGiftCertFaceValue() {
-		return tfFaceValue.getDouble();
-	}
 }

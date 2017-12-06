@@ -20,6 +20,7 @@ package com.floreantpos.ui.views.payment;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -35,6 +36,9 @@ import com.floreantpos.PosException;
 import com.floreantpos.PosLog;
 import com.floreantpos.config.CardConfig;
 import com.floreantpos.config.TerminalConfig;
+import com.floreantpos.extension.ExtensionManager;
+import com.floreantpos.extension.FloreantPlugin;
+import com.floreantpos.extension.GiftCardPaymentPlugin;
 import com.floreantpos.extension.InginicoPlugin;
 import com.floreantpos.extension.PaymentGatewayPlugin;
 import com.floreantpos.main.Application;
@@ -48,7 +52,6 @@ import com.floreantpos.model.PaymentType;
 import com.floreantpos.model.PosTransaction;
 import com.floreantpos.model.Ticket;
 import com.floreantpos.model.TicketDiscount;
-import com.floreantpos.model.User;
 import com.floreantpos.model.UserPermission;
 import com.floreantpos.report.ReceiptPrintService;
 import com.floreantpos.services.PosTransactionService;
@@ -67,12 +70,6 @@ public class SettleTicketProcessor implements CardInputListener {
 	private PaymentType paymentType;
 	private Ticket ticket;
 	private String cardName;
-	private User currentUser;
-
-	public SettleTicketProcessor(User currentUser) {
-		super();
-		this.currentUser = currentUser;
-	}
 
 	public void doSettle(PaymentType paymentType, double tenderAmount) {
 		doSettle(paymentType, tenderAmount, null);
@@ -166,26 +163,25 @@ public class SettleTicketProcessor implements CardInputListener {
 					transaction.setPaymentType(PaymentType.GIFT_CERTIFICATE.name());
 					transaction.setTicket(ticket);
 					transaction.setCaptured(true);
+					transaction.setTipsAmount(ticket.getGratuityAmount());
 					setTransactionAmounts(transaction);
 
-					double giftCertFaceValue = giftCertDialog.getGiftCertFaceValue();
 					double giftCertCashBackAmount = 0;
-					transaction.setTenderAmount(giftCertFaceValue);
+					transaction.setTenderAmount(tenderAmount);
 
-					if (giftCertFaceValue >= ticket.getDueAmount()) {
+					if (tenderAmount >= ticket.getDueAmount()) {
 						transaction.setAmount(ticket.getDueAmount());
-						giftCertCashBackAmount = giftCertFaceValue - ticket.getDueAmount();
+						giftCertCashBackAmount = tenderAmount - ticket.getDueAmount();
 					}
 					else {
-						transaction.setAmount(giftCertFaceValue);
+						transaction.setAmount(tenderAmount);
 					}
 
 					transaction.setGiftCertNumber(giftCertDialog.getGiftCertNumber());
-					transaction.setGiftCertFaceValue(giftCertFaceValue);
-					transaction.setGiftCertPaidAmount(transaction.getAmount());
+					transaction.setGiftCertPaidAmount(transaction.getTenderAmount());
 					transaction.setGiftCertCashBackAmount(giftCertCashBackAmount);
 
-					settleTicket(transaction);
+					payUsingGiftCard(transaction);
 					break;
 
 				default:
@@ -338,6 +334,45 @@ public class SettleTicketProcessor implements CardInputListener {
 		ticket.calculatePrice();
 	}
 
+	private void payUsingGiftCard(PosTransaction transaction) {
+		try {
+			System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
+
+			GiftCardPaymentPlugin giftCardPaymentPlugin = getGiftCardPaymentPlugin();
+			if(giftCardPaymentPlugin == null) {
+				throw new PosException("Gift card payment configuration not configured!");
+			}
+			GiftCardProcessor giftCardProcessor = giftCardPaymentPlugin.getProcessor();
+			transaction.setCardMerchantGateway(giftCardPaymentPlugin.getProductName());
+			giftCardProcessor.chargeAmount(transaction);
+
+			settleTicket(transaction);
+		} catch (PosException e) {
+			POSMessageDialog.showError(POSUtil.getFocusedWindow(), e.getMessage(), e);
+		} catch (Exception e) {
+			POSMessageDialog.showError(POSUtil.getFocusedWindow(), e.getMessage(), e);
+		}
+	}
+
+	private GiftCardPaymentPlugin getGiftCardPaymentPlugin() {
+		String givexGetwayId = TerminalConfig.getGivexGetwayId();
+		GiftCardPaymentPlugin selectedGivexPlugin = null;
+
+		List<FloreantPlugin> plugins = ExtensionManager.getPlugins(GiftCardPaymentPlugin.class);
+
+		for (FloreantPlugin plugin : plugins) {
+			if (plugin instanceof GiftCardPaymentPlugin) {
+				GiftCardPaymentPlugin givexPlugin = (GiftCardPaymentPlugin) plugin;
+				if (givexPlugin.getId().equals(givexGetwayId)) {
+					selectedGivexPlugin = givexPlugin;
+					return selectedGivexPlugin;
+				}
+
+			}
+		}
+		return selectedGivexPlugin;
+	}
+
 	private void payUsingCard(String cardName, final double tenderedAmount) throws Exception {
 		try {
 			//		if (!CardConfig.getMerchantGateway().isCardTypeSupported(cardName)) {
@@ -425,8 +460,7 @@ public class SettleTicketProcessor implements CardInputListener {
 			showTransactionCompleteMsg(dueAmount, transaction.getTenderAmount(), ticket, transaction);
 
 			if (ticket.getDueAmount() > 0.0) {
-				int option = JOptionPane.showConfirmDialog(Application.getPosWindow(), POSConstants.CONFIRM_PARTIAL_PAYMENT, POSConstants.MDS_POS,
-						JOptionPane.YES_NO_OPTION);
+				int option = JOptionPane.showConfirmDialog(Application.getPosWindow(), POSConstants.CONFIRM_PARTIAL_PAYMENT, POSConstants.MDS_POS, JOptionPane.YES_NO_OPTION);
 
 				if (option != JOptionPane.YES_OPTION) {
 
