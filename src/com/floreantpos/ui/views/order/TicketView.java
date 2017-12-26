@@ -175,7 +175,7 @@ public class TicketView extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				ItemSearchDialog dialog = new ItemSearchDialog(Application.getPosWindow());
 				dialog.setTitle("Search item");
-				dialog.setSize(800, 600);
+				dialog.setSize(900, 650);
 				dialog.open();
 				if (dialog.isCanceled()) {
 					return;

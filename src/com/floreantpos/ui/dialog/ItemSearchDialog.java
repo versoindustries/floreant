@@ -23,6 +23,8 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,36 +89,29 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String searchString = tfNumber.getText();
-				if (searchString.equals("0") || searchString.equals("")) { //$NON-NLS-1$ //$NON-NLS-2$
-					POSMessageDialog.showError(Application.getPosWindow(), Messages.getString("ItemSearchDialog.2")); //$NON-NLS-1$
-					return;
-				}
-				List<MenuItem> menuItems = new ArrayList<>();
-				MenuItem menuItem = MenuItemDAO.getInstance().getMenuItemByBarcode(searchString);
-				if (menuItem == null) {
-					try {
-						Integer id = Integer.valueOf(searchString);
-						menuItem = MenuItemDAO.getInstance().get(id);
-					} catch (Exception e2) {
-					}
-				}
-				if (menuItem == null) {
-					menuItems = MenuItemDAO.getInstance().getMenuItemByName(searchString);
-				}
-				if (menuItem != null) {
-					menuItems.add(menuItem);
-				}
-				if ((menuItems != null && menuItems.size() == 1)) {
-					selectedItem = menuItems.get(0);
-					doOk();
-				}
-				else {
-					tableModel.setRows(menuItems);
-				}
+				doSearchItem(false);
 			}
 		};
 		tfNumber.addActionListener(searchListener);
+		tfNumber.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				String searchString = tfNumber.getText();
+				if (searchString.length() > 2)
+					doSearchItem(true);
+				else if (searchString.isEmpty())
+					tableModel.removeAll();
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+		});
 
 		PosButton btnSearch = new PosButton(POSConstants.SEARCH);
 		btnSearch.addActionListener(searchListener);
@@ -128,7 +123,8 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 		table = new JTable();
 		table.setRowHeight(35);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.getTableHeader().setPreferredSize(PosUIManager.getSize(0, 0));
+		table.getTableHeader().setPreferredSize(PosUIManager.getSize(0, 30));
+		table.setMinimumSize(PosUIManager.getSize(0, 400));
 		scrollPane.setViewportView(table);
 
 		tableModel = new BeanTableModel<MenuItem>(MenuItem.class) {
@@ -136,7 +132,7 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 			public Object getValueAt(int rowIndex, int columnIndex) {
 				int index = table.convertRowIndexToModel(rowIndex);
 				MenuItem menuItem = tableModel.getRow(index);
-				if (columnIndex == 1) {
+				if (columnIndex == 2) {
 					return CurrencyUtil.getCurrencySymbol() + NumberUtil.formatNumber(menuItem.getPrice());
 				}
 				return super.getValueAt(rowIndex, columnIndex);
@@ -144,13 +140,15 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
-				if (columnIndex == 1)
+				if (columnIndex == 2)
 					return String.class;
 				return super.getColumnClass(columnIndex);
 			}
 		};
-		tableModel.addColumn(POSConstants.NAME, MenuItem.PROP_NAME);
-		tableModel.addColumn(POSConstants.PRICE, MenuItem.PROP_PRICE);
+		tableModel.addColumn("SKU", MenuItem.PROP_BARCODE);
+		tableModel.addColumn(POSConstants.NAME.toUpperCase(), MenuItem.PROP_NAME);
+		tableModel.addColumn(POSConstants.PRICE.toUpperCase() + " (" + CurrencyUtil.getCurrencySymbol() + ")", "price"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		tableModel.addColumn("AVL " + Messages.getString("MenuItemExplorer.16"), "stockAmount"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		table.setModel(tableModel);
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -164,7 +162,7 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 				selectedItem = tableModel.getRow(index);
 			}
 		});
-		table.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
+		table.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 				Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -179,9 +177,43 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 		contentPane.add(qwertyKeyPad, "spanx ,grow"); //$NON-NLS-1$
 	}
 
+	private void doSearchItem(boolean searchByNameOnly) {
+		String searchString = tfNumber.getText();
+		if (searchString.equals("0") || searchString.equals("")) { //$NON-NLS-1$ //$NON-NLS-2$
+			POSMessageDialog.showError(Application.getPosWindow(), Messages.getString("ItemSearchDialog.2")); //$NON-NLS-1$
+			return;
+		}
+		List<MenuItem> menuItems = new ArrayList<>();
+		if (!searchByNameOnly) {
+			MenuItem menuItem = MenuItemDAO.getInstance().getMenuItemByBarcode(searchString);
+			if (menuItem == null) {
+				try {
+					Integer id = Integer.valueOf(searchString);
+					menuItem = MenuItemDAO.getInstance().get(id);
+				} catch (Exception e2) {
+				}
+			}
+			if (menuItem != null) {
+				menuItems.add(menuItem);
+			}
+		}
+		if (menuItems.isEmpty()) {
+			menuItems = MenuItemDAO.getInstance().getMenuItemByName(searchString);
+		}
+		if (!searchByNameOnly && menuItems != null && menuItems.size() == 1) {
+			selectedItem = menuItems.get(0);
+			doOk();
+		}
+		else {
+			tableModel.setRows(menuItems);
+		}
+	}
+
 	private void resizeTableColumns() {
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		setColumnWidth(1, PosUIManager.getSize(90));
+		setColumnWidth(0, PosUIManager.getSize(120));
+		setColumnWidth(2, PosUIManager.getSize(90));
+		setColumnWidth(3, PosUIManager.getSize(90));
 	}
 
 	private void setColumnWidth(int columnNumber, int width) {
