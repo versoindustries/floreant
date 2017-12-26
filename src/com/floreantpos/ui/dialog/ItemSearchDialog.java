@@ -57,7 +57,7 @@ import com.floreantpos.util.POSUtil;
 
 public class ItemSearchDialog extends OkCancelOptionDialog {
 
-	private JTextField tfNumber;
+	private JTextField tfSearchInput;
 	private JTable table;
 	private BeanTableModel<MenuItem> tableModel;
 	private MenuItem selectedItem;
@@ -79,11 +79,11 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 		MigLayout layout = new MigLayout("inset 0,fill"); //$NON-NLS-1$ 
 		contentPane.setLayout(layout);
 
-		tfNumber = new JTextField();
-		tfNumber.setFont(tfNumber.getFont().deriveFont(Font.BOLD, PosUIManager.getNumberFieldFontSize()));
-		tfNumber.setFocusable(true);
-		tfNumber.requestFocus();
-		tfNumber.setBackground(Color.WHITE);
+		tfSearchInput = new JTextField();
+		tfSearchInput.setFont(tfSearchInput.getFont().deriveFont(Font.BOLD, PosUIManager.getNumberFieldFontSize()));
+		tfSearchInput.setFocusable(true);
+		tfSearchInput.requestFocus();
+		tfSearchInput.setBackground(Color.WHITE);
 
 		ActionListener searchListener = new ActionListener() {
 
@@ -92,8 +92,8 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 				doSearchItem(false);
 			}
 		};
-		tfNumber.addActionListener(searchListener);
-		tfNumber.addKeyListener(new KeyListener() {
+		tfSearchInput.addActionListener(searchListener);
+		KeyListener keyListener = new KeyListener() {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
@@ -101,7 +101,7 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				String searchString = tfNumber.getText();
+				String searchString = tfSearchInput.getText();
 				if (searchString.length() > 2)
 					doSearchItem(true);
 				else if (searchString.isEmpty())
@@ -111,12 +111,13 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 			@Override
 			public void keyPressed(KeyEvent e) {
 			}
-		});
+		};
+		tfSearchInput.addKeyListener(keyListener);
 
 		PosButton btnSearch = new PosButton(POSConstants.SEARCH);
 		btnSearch.addActionListener(searchListener);
 
-		contentPane.add(tfNumber, "spanx,split 2, grow"); //$NON-NLS-1$
+		contentPane.add(tfSearchInput, "spanx,split 2, grow"); //$NON-NLS-1$
 		contentPane.add(btnSearch, "w 90!"); //$NON-NLS-1$
 
 		PosScrollPane scrollPane = new PosScrollPane();
@@ -172,13 +173,14 @@ public class ItemSearchDialog extends OkCancelOptionDialog {
 		});
 		resizeTableColumns();
 		QwertyKeyPad qwertyKeyPad = new QwertyKeyPad();
+		qwertyKeyPad.setKeyPadListener(keyListener);
 
 		contentPane.add(scrollPane, "spanx,grow"); //$NON-NLS-1$
 		contentPane.add(qwertyKeyPad, "spanx ,grow"); //$NON-NLS-1$
 	}
 
 	private void doSearchItem(boolean searchByNameOnly) {
-		String searchString = tfNumber.getText();
+		String searchString = tfSearchInput.getText();
 		if (searchString.equals("0") || searchString.equals("")) { //$NON-NLS-1$ //$NON-NLS-2$
 			POSMessageDialog.showError(Application.getPosWindow(), Messages.getString("ItemSearchDialog.2")); //$NON-NLS-1$
 			return;

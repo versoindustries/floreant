@@ -27,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -50,7 +51,8 @@ public class QwertyKeyPad extends JXCollapsiblePane implements ActionListener, C
 	String[] s4 = { "z", "x", "c", "v", "b", "n", "m", "-", ",", "." }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
 
 	private ArrayList<PosButton> buttons = new ArrayList<PosButton>();
-	Dimension size = PosUIManager.getSize(60, 60);
+	private Dimension size = PosUIManager.getSize(60, 60);
+	private KeyListener keyPadListener;
 
 	public QwertyKeyPad() {
 		createUI();
@@ -151,6 +153,8 @@ public class QwertyKeyPad extends JXCollapsiblePane implements ActionListener, C
 			}
 			note.setText(str + s);
 		}
+		if (keyPadListener != null)
+			keyPadListener.keyReleased(null);
 	}
 
 	public void stateChanged(ChangeEvent e) {
@@ -198,6 +202,10 @@ public class QwertyKeyPad extends JXCollapsiblePane implements ActionListener, C
 
 		frame.pack();
 		frame.setVisible(true);
+	}
+
+	public void setKeyPadListener(KeyListener keyPadListener) {
+		this.keyPadListener = keyPadListener;
 	}
 
 }
