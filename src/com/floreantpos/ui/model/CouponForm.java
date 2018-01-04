@@ -18,7 +18,6 @@
 package com.floreantpos.ui.model;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,9 +36,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import org.jdesktop.swingx.JXDatePicker;
 
@@ -184,17 +182,11 @@ public class CouponForm extends BeanEditor implements ItemListener {
 		String[] colHeaders = new String[] { "Item name", "Item price" };
 		itemModel = new ItemListModel(colHeaders);
 		addedListItems.setModel(itemModel);
-		
-		addedListItems.getColumnModel().getColumn(1).setCellRenderer(new TableCellRenderer() {
-			
-			@Override
-			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-				JLabel lblValue = new JLabel((String)value);
-				lblValue.setHorizontalAlignment(JLabel.RIGHT);
-				return lblValue;
-			}
-		});
-		
+
+		DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+		rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+		addedListItems.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
+
 		itemPanel.add(itemSearchPanel, BorderLayout.SOUTH);
 		itemScrollPane = new JScrollPane(addedListItems);
 
@@ -433,7 +425,7 @@ public class CouponForm extends BeanEditor implements ItemListener {
 			List<Entry<Entry>> searchItems = new ArrayList<>();
 			for (Entry<Entry> entry : addedItems) {
 				String itemName = entry.getValue().toString();
-				if (itemName.contains(searchTxt) || itemName.toLowerCase().contains(searchTxt)||itemName.toLowerCase().contains(searchTxt.toLowerCase())) {
+				if (itemName.contains(searchTxt) || itemName.toLowerCase().contains(searchTxt) || itemName.toLowerCase().contains(searchTxt.toLowerCase())) {
 					searchItems.add(entry);
 				}
 			}

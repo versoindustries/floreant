@@ -18,7 +18,6 @@
 package com.floreantpos.ui.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -33,9 +32,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import com.floreantpos.POSConstants;
 import com.floreantpos.config.AppProperties;
@@ -60,13 +58,7 @@ public class ItemSelectionDialog extends POSDialog implements ActionListener {
 	private CheckBoxList cbListItems;
 	private ItemCheckBoxListModel itemModel;
 	private JTextField tfSearchField;
-	//	private CheckBoxList cbSelectedItemList;
-	//	private ItemCheckBoxListModel selectedItemModel;
 	private PosButton btnAdd;
-	//	private JPanel rightPanel;
-	//	private TitlePanel leftTitlePanel;
-	//	private TitlePanel rightTitlePanel;
-	//	private JSeparator separator;
 	private List<Entry> selectedItems = new ArrayList<>();
 	private ButtonGroup btnGroup;
 	private JCheckBox cbShowSelected;
@@ -157,15 +149,10 @@ public class ItemSelectionDialog extends POSDialog implements ActionListener {
 		cbListItems.setModel(itemModel);
 		cbListItems.resizeColWidth();
 
-		cbListItems.getColumnModel().getColumn(2).setCellRenderer(new TableCellRenderer() {
-
-			@Override
-			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-				JLabel lblValue = new JLabel((String) value);
-				lblValue.setHorizontalAlignment(JLabel.RIGHT);
-				return lblValue;
-			}
-		});
+		DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+		rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+		cbListItems.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
+		;
 
 		cbListItems.addMouseListener(new MouseAdapter() {
 			@Override
