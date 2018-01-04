@@ -45,6 +45,7 @@ import com.floreantpos.model.MenuItem;
 import com.floreantpos.model.MenuItemModifierGroup;
 import com.floreantpos.model.OrderType;
 import com.floreantpos.model.Terminal;
+import com.floreantpos.swing.PaginationSupport;
 
 public class MenuItemDAO extends BaseMenuItemDAO {
 
@@ -197,14 +198,14 @@ public class MenuItemDAO extends BaseMenuItemDAO {
 				criteria.add(Restrictions.eq("type.id", orderType.getId()));
 
 				/*List<MenuItem> selectedMenuItems = new ArrayList();
-
+				
 				List<MenuItem> items = findAll();
-
+				
 				for (MenuItem item : items) {
-
+				
 					List<OrderType> types = item.getOrderTypeList();
 					OrderType type = (OrderType) selectedType;
-
+				
 					if (types.contains(type.getName()) || types.isEmpty()) {
 						selectedMenuItems.add(item);
 					}
@@ -246,11 +247,11 @@ public class MenuItemDAO extends BaseMenuItemDAO {
 				criteria.add(Restrictions.eq("type.id", orderType.getId()));
 
 				/*List<MenuItem> selectedMenuItems = new ArrayList();
-
+				
 				List<MenuItem> items = findAll();
-
+				
 				for (MenuItem item : items) {
-
+				
 					List<OrderType> types = item.getOrderTypeList();
 					OrderType type = (OrderType) selectedType;
 					if (types.contains(type.getName()) || types.isEmpty()) {
@@ -409,6 +410,33 @@ public class MenuItemDAO extends BaseMenuItemDAO {
 		} catch (Exception e) {
 			tx.rollback();
 			PosLog.error(getClass(), e);
+		} finally {
+			closeSession(session);
+		}
+	}
+
+	public void loadMenuItems(PaginationSupport model, String name) {
+		Session session = null;
+		Criteria criteria = null;
+		try {
+			session = createNewSession();
+			criteria = session.createCriteria(MenuItem.class);
+			if (StringUtils.isNotEmpty(name)) {
+				criteria.add(Restrictions.ilike(MenuItem.PROP_NAME, name, MatchMode.ANYWHERE));
+			}
+			criteria.setProjection(Projections.rowCount());
+			Number uniqueResult = (Number) criteria.uniqueResult();
+			model.setNumRows(uniqueResult.intValue());
+			criteria = session.createCriteria(MenuItem.class);
+			if (StringUtils.isNotEmpty(name)) {
+				criteria.add(Restrictions.ilike(MenuItem.PROP_NAME, name, MatchMode.ANYWHERE));
+			}
+			criteria.addOrder(Order.asc(MenuItem.PROP_SORT_ORDER));
+			criteria.addOrder(Order.asc(MenuItem.PROP_NAME));
+			criteria.setFirstResult(model.getCurrentRowIndex());
+			criteria.setMaxResults(model.getPageSize());
+			List<MenuItem> result = criteria.list();
+			model.setRows(result);
 		} finally {
 			closeSession(session);
 		}

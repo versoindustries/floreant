@@ -23,7 +23,6 @@ import java.util.List;
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
@@ -33,6 +32,7 @@ import javax.swing.table.TableColumn;
 public class CheckBoxList<E> extends JTable {
 
 	public CheckBoxList() {
+		resizeColWidth();
 	}
 
 	public CheckBoxList(E[] items) {
@@ -44,25 +44,68 @@ public class CheckBoxList<E> extends JTable {
 	}
 
 	public void setModel(E[] items) {
-		setModel(new CheckBoxListModel(items));
-		init();
+		setModel(items, new String[] {"",""});
 	}
 
 	public void setModel(List<E> items) {
-		setModel(new CheckBoxListModel<E>(items));
-		init();
+		setModel(items, new String[] {"",""});
+	}
+
+	public void setModel(List<E> items, String[] header) {
+		CheckBoxListModel<E> model = new CheckBoxListModel<E>(header, items);
+		setModel(model);
+		resizeColWidth();
+	}
+	public void setModel(E[] items, String[] header) {
+		CheckBoxListModel<E> model = new CheckBoxListModel<E>(items, header);
+		setModel(model);
+		resizeColWidth();
 	}
 
 	public List<E> getCheckedValues() {
 		List values = new ArrayList();
 		CheckBoxListModel model = (CheckBoxListModel) getModel();
+		if (model.items == null) {
+			return values;
+		}
 		for (int i = 0; i < model.items.size(); i++) {
 			CheckBoxList.Entry<E> entry = (Entry<E>) model.items.get(i);
-			if(entry.checked) {
+			if (entry.checked) {
 				values.add(entry.value);
 			}
 		}
 		return values;
+	}
+	
+	public List<E> getUnCheckedValues() {
+		List values = new ArrayList();
+		CheckBoxListModel model = (CheckBoxListModel) getModel();
+		if (model.items == null) {
+			return values;
+		}
+		for (int i = 0; i < model.items.size(); i++) {
+			CheckBoxList.Entry<E> entry = (Entry<E>) model.items.get(i);
+			if (!entry.checked) {
+				values.add(entry.value);
+			}
+		}
+		return values;
+	}
+
+	public void setSelected(Object type) {
+		CheckBoxListModel model = (CheckBoxListModel) getModel();
+
+		if (type != null) {
+			for (int i = 0; i < model.items.size(); i++) {
+				Entry entry = (Entry) model.items.get(i);
+				if (type.equals(entry.value)) {
+					entry.checked = true;
+					break;
+				}
+			}
+			model.fireTableRowsUpdated(0, model.getRowCount());
+		}
+
 	}
 
 	//{{{ selectAll() method
@@ -81,7 +124,7 @@ public class CheckBoxList<E> extends JTable {
 	public void selectItems(List types) {
 		CheckBoxListModel model = (CheckBoxListModel) getModel();
 
-		if(types != null) {
+		if (types != null && model.items != null) {
 			for (int i = 0; i < model.items.size(); i++) {
 				Entry entry = (Entry) model.items.get(i);
 
@@ -89,7 +132,7 @@ public class CheckBoxList<E> extends JTable {
 
 					Object type = types.get(j);
 
-					if(type.equals(entry.value)) {
+					if (type.equals(entry.value)) {
 						entry.checked = true;
 						break;
 
@@ -121,7 +164,7 @@ public class CheckBoxList<E> extends JTable {
 
 	public Object getSelectedValue() {
 		int row = getSelectedRow();
-		if(row == -1) {
+		if (row == -1) {
 			return null;
 		}
 		else {
@@ -134,25 +177,32 @@ public class CheckBoxList<E> extends JTable {
 
 		TableCellRenderer cellRenderer = super.getCellRenderer(row, column);
 
-		if(cellRenderer instanceof JCheckBox) {
+		if (cellRenderer instanceof JCheckBox) {
 			((JCheckBox) cellRenderer).setEnabled(isEnabled());
 		}
+		
 		return cellRenderer;
 	}
 
-	public void init() {
+	public void resizeColWidth() {
 		getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		setShowGrid(false);
+		setRowHeight(30);
 		setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		TableColumn column = getColumnModel().getColumn(0);
-		int checkBoxWidth = new JCheckBox().getPreferredSize().width;
-		column.setPreferredWidth(checkBoxWidth);
-		column.setMinWidth(checkBoxWidth);
-		column.setWidth(checkBoxWidth);
-		column.setMaxWidth(checkBoxWidth);
-		column.setResizable(false);
+		if (getColumnModel() != null && getColumnCount() > 0) {
+			TableColumn column = getColumnModel().getColumn(0);
+			int checkBoxWidth = new JCheckBox().getPreferredSize().width;
+			column.setPreferredWidth(checkBoxWidth);
+			column.setMinWidth(checkBoxWidth);
+			column.setWidth(checkBoxWidth);
+			column.setMaxWidth(checkBoxWidth);
+			column.setResizable(false);
+		}
+	}
 
-		setTableHeader(null);
+	public void setTableHeaderHide(boolean hideHeader) {
+		if (hideHeader)
+			setTableHeader(null);
 	}
 
 	/**
@@ -188,93 +238,4 @@ public class CheckBoxList<E> extends JTable {
 		}
 	}
 
-	public static class CheckBoxListModel<E> extends AbstractTableModel {
-		List<CheckBoxList.Entry<E>> items;
-
-		protected CheckBoxListModel(List<E> _items) {
-			items = new ArrayList<CheckBoxList.Entry<E>>(_items.size());
-			for (int i = 0; i < _items.size(); i++) {
-				items.add(createEntry(_items.get(i)));
-			}
-		}
-
-		CheckBoxListModel(E[] _items) {
-			items = new ArrayList<CheckBoxList.Entry<E>>(_items.length);
-			for (int i = 0; i < _items.length; i++) {
-				items.add(createEntry(_items[i]));
-			}
-		}
-
-		protected CheckBoxList.Entry createEntry(E obj) {
-			if(obj instanceof CheckBoxList.Entry)
-				return (CheckBoxList.Entry) obj;
-			else
-				return new CheckBoxList.Entry(false, obj);
-		}
-
-		public int getRowCount() {
-			return items.size();
-		}
-
-		public int getColumnCount() {
-			return 2;
-		}
-
-		@Override
-		public String getColumnName(int col) {
-			return null;
-		}
-
-		public Object getValueAt(int row, int col) {
-			CheckBoxList.Entry entry = items.get(row);
-			switch (col) {
-				case 0:
-
-					return Boolean.valueOf(entry.checked);
-
-				case 1:
-
-					return entry.value;
-				default:
-					throw new InternalError();
-			}
-		}
-
-		@Override
-		public Class getColumnClass(int col) {
-			switch (col) {
-				case 0:
-					return Boolean.class;
-				case 1:
-					return String.class;
-				default:
-					throw new InternalError();
-			}
-		}
-
-		@Override
-		public boolean isCellEditable(int row, int col) {
-			return col == 0;
-		}
-
-		@Override
-		public void setValueAt(Object value, int row, int col) {
-			if(col == 0) {
-				CheckBoxList.Entry entry = items.get(row);
-				entry.checked = (value.equals(Boolean.TRUE));
-
-				fireTableRowsUpdated(row, row);
-			}
-		}
-
-		public List<CheckBoxList.Entry<E>> getItems() {
-
-			return items;
-		}
-
-		public void setItems(List<CheckBoxList.Entry<E>> items) {
-			this.items = items;
-		}
-
-	}
 }

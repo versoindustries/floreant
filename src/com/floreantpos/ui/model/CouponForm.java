@@ -18,25 +18,28 @@
 package com.floreantpos.ui.model;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
-
-import net.miginfocom.swing.MigLayout;
+import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.JXDatePicker;
 
@@ -45,15 +48,21 @@ import com.floreantpos.POSConstants;
 import com.floreantpos.model.Discount;
 import com.floreantpos.model.MenuItem;
 import com.floreantpos.model.dao.DiscountDAO;
-import com.floreantpos.model.dao.MenuItemDAO;
+import com.floreantpos.swing.CheckBoxList;
+import com.floreantpos.swing.CheckBoxList.Entry;
+import com.floreantpos.swing.CheckBoxListModel;
 import com.floreantpos.swing.DoubleTextField;
 import com.floreantpos.swing.FixedLengthTextField;
-import com.floreantpos.swing.ItemCheckBoxList;
 import com.floreantpos.swing.MessageDialog;
-import com.floreantpos.swing.PosButton;
 import com.floreantpos.ui.BeanEditor;
+import com.floreantpos.ui.TitlePanel;
 import com.floreantpos.ui.dialog.ItemSelectionDialog;
 import com.floreantpos.ui.dialog.POSMessageDialog;
+import com.floreantpos.util.NumberUtil;
+import com.floreantpos.util.POSUtil;
+
+import net.authorize.util.StringUtils;
+import net.miginfocom.swing.MigLayout;
 
 public class CouponForm extends BeanEditor implements ItemListener {
 	private JPanel contentPane;
@@ -74,14 +83,15 @@ public class CouponForm extends BeanEditor implements ItemListener {
 
 	private JPanel itemSearchPanel;
 
-	private JTextField txtSearchItem;
-
 	private JScrollPane itemScrollPane;
 
-	private ItemCheckBoxList cbListItems;
-	private ItemCheckBoxList addedListItems;
+	private CheckBoxList addedListItems;
 
 	private String uuid;
+	private ItemListModel itemModel;
+	private JTextField tfSearch;
+	private JButton btnSearch;
+	private List<Entry> addedItems = new ArrayList<Entry>();
 
 	public CouponForm() {
 		this(new Discount());
@@ -89,19 +99,15 @@ public class CouponForm extends BeanEditor implements ItemListener {
 
 	public CouponForm(Discount coupon) {
 		initializeComponent();
-
 		cbCouponType.setModel(new DefaultComboBoxModel(Discount.COUPON_TYPE_NAMES));
-
 		cbQualificationType.setModel(new DefaultComboBoxModel(Discount.COUPON_QUALIFICATION_NAMES));
 		cbQualificationType.addItemListener(this);
 		cbCouponType.addItemListener(this);
-
 		setBean(coupon);
 	}
 
 	private void initializeComponent() {
 		setLayout(new BorderLayout(10, 10));
-
 		contentPane = new JPanel();
 		contentPane.setLayout(new MigLayout());
 		contentPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null));
@@ -152,20 +158,51 @@ public class CouponForm extends BeanEditor implements ItemListener {
 
 		createItemSearchPanel();
 
-		itemPanel = new JPanel(new BorderLayout(10, 10));
+		itemPanel = new JPanel(new BorderLayout(10, 5));
 		itemPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null));
 
-		cbListItems = new ItemCheckBoxList();
-		List<MenuItem> menuItems = MenuItemDAO.getInstance().findAll();
-		cbListItems.setModel(menuItems);
+		TitlePanel titlePanel = new TitlePanel();
+		titlePanel.setTitle("Discounted items");
+		itemPanel.add(titlePanel, BorderLayout.NORTH);
+		tfSearch = new JTextField();
+		tfSearch.addActionListener(new ActionListener() {
 
-		addedListItems = new ItemCheckBoxList();
-		addedListItems.setModel(cbListItems.getCheckedValues());
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doSearchItem();
+			}
+		});
+		btnSearch = new JButton("Search");
+		btnSearch.addActionListener(new ActionListener() {
 
-		itemPanel.add(itemSearchPanel, BorderLayout.NORTH);
+			@Override
+			public void actionPerformed(ActionEvent ev) {
+				doSearchItem();
+			}
+		});
+		addedListItems = new CheckBoxList();
+		String[] colHeaders = new String[] { "Item name", "Item price" };
+		itemModel = new ItemListModel(colHeaders);
+		addedListItems.setModel(itemModel);
+		
+		addedListItems.getColumnModel().getColumn(1).setCellRenderer(new TableCellRenderer() {
+			
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+				JLabel lblValue = new JLabel((String)value);
+				lblValue.setHorizontalAlignment(JLabel.RIGHT);
+				return lblValue;
+			}
+		});
+		
+		itemPanel.add(itemSearchPanel, BorderLayout.SOUTH);
 		itemScrollPane = new JScrollPane(addedListItems);
 
-		itemPanel.add(itemScrollPane, BorderLayout.CENTER);
+		JPanel centerPanel = new JPanel(new MigLayout("fill, ins 0"));
+		centerPanel.add(tfSearch, "grow, split 2");
+		centerPanel.add(btnSearch, "wrap");
+		centerPanel.add(itemScrollPane, "grow");
+		itemPanel.add(centerPanel, BorderLayout.CENTER);
 
 		add(contentPane, BorderLayout.WEST);
 		add(itemPanel, BorderLayout.CENTER);
@@ -175,59 +212,23 @@ public class CouponForm extends BeanEditor implements ItemListener {
 
 	private void createItemSearchPanel() {
 		itemSearchPanel = new JPanel();
-		itemSearchPanel.setLayout(new BorderLayout(5, 5));
+		itemSearchPanel.setLayout(new MigLayout("ins 0, center"));
 
-		PosButton btnSearch = new PosButton(POSConstants.ADD); //$NON-NLS-1$
-		btnSearch.setPreferredSize(new Dimension(60, 40));
-
-		txtSearchItem = new JTextField();
-
-		txtSearchItem.addActionListener(new ActionListener() {
+		JButton btnAdd = new JButton("ADD/EDIT ITEMS");
+		btnAdd.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
-				if (txtSearchItem.getText().equals("")) { //$NON-NLS-1$
-					POSMessageDialog.showMessage(Messages.getString("CouponForm.8")); //$NON-NLS-1$
-					return;
-				}
-
-				if (!addMenuItemByBarcode(txtSearchItem.getText())) {
-					addMenuItemByItemId(txtSearchItem.getText());
-				}
-				txtSearchItem.setText(""); //$NON-NLS-1$
+				doOpenItemSelectionDialog();
 			}
 		});
-
-		btnSearch.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				ItemSelectionDialog dialog = new ItemSelectionDialog();
-				dialog.setModel(cbListItems.getModel());
-				dialog.open();
-				if (dialog.isCanceled()) {
-					return;
-				}
-				cbListItems.setModel(dialog.getModel());
-				addedListItems.setModel(cbListItems.getCheckedValues());
-				addedListItems.selectItems(cbListItems.getCheckedValues());
-				txtSearchItem.requestFocus();
-
-			}
-		});
-		itemSearchPanel.add(txtSearchItem);
-		itemSearchPanel.add(btnSearch, BorderLayout.EAST);
+		itemSearchPanel.add(btnAdd);
 	}
 
 	@Override
 	public void itemStateChanged(ItemEvent event) {
 		if (event.getItem() == Discount.COUPON_QUALIFICATION_NAMES[0]) {
-			List<MenuItem> menuItems = MenuItemDAO.getInstance().findAll();
 			itemPanel.setVisible(true);
-			cbListItems.setModel(menuItems);
-			addedListItems.setModel(cbListItems.getCheckedValues());
 		}
 		else if (event.getItem() == Discount.COUPON_TYPE_NAMES[Discount.DISCOUNT_TYPE_AMOUNT]) {
 			chkModifiable.setVisible(true);
@@ -246,34 +247,6 @@ public class CouponForm extends BeanEditor implements ItemListener {
 		else {
 			itemPanel.setVisible(false);
 		}
-	}
-
-	private boolean addMenuItemByBarcode(String barcode) {
-
-		MenuItemDAO dao = new MenuItemDAO();
-
-		MenuItem menuItem = dao.getMenuItemByBarcode(barcode);
-
-		if (menuItem == null) {
-			return false;
-		}
-
-		//add to list
-		return true;
-	}
-
-	private boolean addMenuItemByItemId(String id) {
-
-		Integer itemId = Integer.parseInt(id);
-
-		MenuItem menuItem = MenuItemDAO.getInstance().get(itemId);
-		if (menuItem == null) {
-			return false;
-		}
-		cbListItems.setSelected(menuItem);
-		addedListItems.setModel(cbListItems.getCheckedValues());
-		addedListItems.selectItems(cbListItems.getCheckedValues());
-		return true;
 	}
 
 	@Override
@@ -297,9 +270,9 @@ public class CouponForm extends BeanEditor implements ItemListener {
 	protected void updateView() {
 		Discount coupon = (Discount) getBean();
 		if (coupon.getId() == null) {
-			chkEnabled.setSelected(true); 
-			tfMinimumQua.setText("0"); 
-			cbCouponType.setSelectedIndex(Discount.DISCOUNT_TYPE_PERCENTAGE); 
+			chkEnabled.setSelected(true);
+			tfMinimumQua.setText("0");
+			cbCouponType.setSelectedIndex(Discount.DISCOUNT_TYPE_PERCENTAGE);
 			return;
 		}
 
@@ -318,9 +291,11 @@ public class CouponForm extends BeanEditor implements ItemListener {
 		chkNeverExpire.setSelected(coupon.isNeverExpire());
 
 		if (coupon.getQualificationType() == Discount.QUALIFICATION_TYPE_ITEM) {
-			cbListItems.selectItems(coupon.getMenuItems());
-			addedListItems.setModel(cbListItems.getCheckedValues());
-			addedListItems.selectItems(cbListItems.getCheckedValues());
+			if (coupon.getMenuItems() != null) {
+				itemModel.setRows(coupon.getMenuItems());
+				addedItems.addAll(itemModel.getItems());
+				addedListItems.selectAll();
+			}
 		}
 		/*else if (coupon.getQUALIFICATION_TYPE() == Discount.QUALIFICATION_TYPE_GROUP) {
 			cbListItems.selectItems(coupon.getMenuGroups());
@@ -383,6 +358,7 @@ public class CouponForm extends BeanEditor implements ItemListener {
 				coupon.setApplyToAll(false);
 			}
 			else {
+				coupon.setMenuItems(null);
 				coupon.setApplyToAll(true);
 			}
 		}
@@ -427,6 +403,93 @@ public class CouponForm extends BeanEditor implements ItemListener {
 			return Messages.getString("CouponForm.3"); //$NON-NLS-1$
 		}
 		return Messages.getString("CouponForm.4"); //$NON-NLS-1$
+	}
+
+	private void doOpenItemSelectionDialog() {
+		try {
+			ItemSelectionDialog dialog = new ItemSelectionDialog();
+			dialog.setItems(itemModel.getItems());
+			dialog.open();
+			if (dialog.isCanceled()) {
+				return;
+			}
+			itemModel.setRows(dialog.getItems());
+			addedItems.addAll(dialog.getItems());
+			addedListItems.repaint();
+		} catch (Exception ex) {
+			POSMessageDialog.showError(POSUtil.getFocusedWindow(), ex.getMessage(), ex);
+		}
+	}
+
+	private void doSearchItem() {
+		try {
+			String searchTxt = tfSearch.getText();
+			if (StringUtils.isEmpty(searchTxt)) {
+				itemModel.getItems().clear();
+				itemModel.setRows(addedItems);
+				return;
+			}
+
+			List<Entry<Entry>> searchItems = new ArrayList<>();
+			for (Entry<Entry> entry : addedItems) {
+				String itemName = entry.getValue().toString();
+				if (itemName.contains(searchTxt) || itemName.toLowerCase().contains(searchTxt)||itemName.toLowerCase().contains(searchTxt.toLowerCase())) {
+					searchItems.add(entry);
+				}
+			}
+			itemModel.getItems().clear();
+			itemModel.setRows(searchItems);
+			itemModel.fireTableDataChanged();
+		} catch (Exception e) {
+			POSMessageDialog.showError(POSUtil.getFocusedWindow(), e.getMessage(), e);
+		}
+	}
+
+	public class ItemListModel extends CheckBoxListModel<CheckBoxList.Entry> {
+		public ItemListModel(String[] names) {
+			super(names);
+		}
+
+		@Override
+		public Object getValueAt(int row, int col) {
+			CheckBoxList.Entry entry = getItems().get(row);
+			switch (col) {
+				case 0:
+					if (entry.value instanceof MenuItem) {
+						return ((MenuItem) entry.value).getName();
+					}
+					return entry.value;
+
+				case 1:
+					return NumberUtil.formatNumber(((MenuItem) entry.value).getPrice());
+
+				default:
+					throw new InternalError();
+			}
+		}
+
+		@Override
+		public void setValueAt(Object value, int row, int col) {
+			if (col == 0) {
+				CheckBoxList.Entry entry = getItems().get(row);
+				entry.checked = (value.equals(Boolean.TRUE));
+
+				fireTableRowsUpdated(row, row);
+			}
+		}
+
+		@Override
+		public Class getColumnClass(int col) {
+			switch (col) {
+				case 0:
+					return String.class;
+				case 1:
+					return String.class;
+				default:
+					throw new InternalError();
+			}
+		}
+
 	}
 
 }

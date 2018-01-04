@@ -316,7 +316,7 @@ public class MenuItemForm extends BeanEditor<MenuItem> implements ActionListener
 		lblSortOrder = new JLabel(Messages.getString("MenuItemForm.lblSortOrder.text")); //$NON-NLS-1$
 		tfSortOrder.setText(""); //$NON-NLS-1$
 		lblBarcode = new JLabel(Messages.getString("MenuItemForm.lblBarcode.text")); //$NON-NLS-1$
-		cbTaxGroup.setPreferredSize(new Dimension(198, 0));
+		cbTaxGroup.setPreferredSize(new Dimension(228, 0));
 		///lblButtonColor = new JLabel(Messages.getString("MenuItemForm.lblButtonColor.text")); //$NON-NLS-1$
 		btnButtonColor = new JButton(); //$NON-NLS-1$
 		btnButtonColor.setPreferredSize(new Dimension(228, 40));
@@ -466,6 +466,7 @@ public class MenuItemForm extends BeanEditor<MenuItem> implements ActionListener
 
 		tabGeneral.add(new JLabel(Messages.getString("MenuItemForm.25")), "cell 2 3,,aligny top,alignx right"); //$NON-NLS-1$ //$NON-NLS-2$
 		orderList = new CheckBoxList();
+		orderList.setTableHeaderHide(true);
 
 		List<OrderType> orderTypes = Application.getInstance().getOrderTypes();
 		orderList.setModel(orderTypes);

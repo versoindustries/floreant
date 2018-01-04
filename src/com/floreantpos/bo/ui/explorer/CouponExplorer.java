@@ -30,6 +30,7 @@ import javax.swing.table.AbstractTableModel;
 import com.floreantpos.bo.ui.BOMessageDialog;
 import com.floreantpos.model.Discount;
 import com.floreantpos.model.dao.DiscountDAO;
+import com.floreantpos.swing.PosUIManager;
 import com.floreantpos.swing.TransparentPanel;
 import com.floreantpos.ui.PosTableRenderer;
 import com.floreantpos.ui.dialog.BeanEditorDialog;
@@ -79,6 +80,7 @@ public class CouponExplorer extends TransparentPanel implements ActionListener {
 		try {
 			CouponForm editor = new CouponForm();
 			BeanEditorDialog dialog = new BeanEditorDialog(POSUtil.getBackOfficeWindow(), editor);
+			dialog.setPreferredSize(PosUIManager.getSize(900, 500));
 			dialog.open();
 
 			if (dialog.isCanceled())
@@ -94,6 +96,7 @@ public class CouponExplorer extends TransparentPanel implements ActionListener {
 		try {
 			CouponForm editor = new CouponForm(coupon);
 			BeanEditorDialog dialog = new BeanEditorDialog(POSUtil.getBackOfficeWindow(), editor);
+			dialog.setPreferredSize(PosUIManager.getSize(900, 500));
 			dialog.open();
 			if (dialog.isCanceled())
 				return;
