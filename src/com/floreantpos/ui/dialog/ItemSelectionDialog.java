@@ -303,7 +303,20 @@ public class ItemSelectionDialog extends POSDialog implements ActionListener {
 
 	private void addOrRemoveItem(Entry entry) {
 		if (entry.isChecked()) {
-			selectedItems.add(entry);
+			if(selectedItems.isEmpty()) {
+				selectedItems.add(entry);
+				return;
+			}
+			boolean isContain = false;
+			for (Entry existedEntry : selectedItems) {
+				if(existedEntry.getValue().equals(entry.getValue())) {
+					isContain = true;
+					break;
+				}
+			}
+			if(!isContain) {
+				selectedItems.add(entry);
+			}
 		}
 		else {
 			for (Iterator iterator = selectedItems.iterator(); iterator.hasNext();) {

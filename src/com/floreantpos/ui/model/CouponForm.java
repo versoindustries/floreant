@@ -399,13 +399,16 @@ public class CouponForm extends BeanEditor implements ItemListener {
 
 	private void doOpenItemSelectionDialog() {
 		try {
+
 			ItemSelectionDialog dialog = new ItemSelectionDialog();
 			dialog.setItems(itemModel.getItems());
 			dialog.open();
 			if (dialog.isCanceled()) {
 				return;
 			}
+			
 			itemModel.setRows(dialog.getItems());
+			addedItems.clear();
 			addedItems.addAll(dialog.getItems());
 			addedListItems.repaint();
 		} catch (Exception ex) {
