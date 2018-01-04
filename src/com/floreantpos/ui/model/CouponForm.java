@@ -160,7 +160,7 @@ public class CouponForm extends BeanEditor implements ItemListener {
 		itemPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null));
 
 		TitlePanel titlePanel = new TitlePanel();
-		titlePanel.setTitle("Discounted items");
+		titlePanel.setTitle(Messages.getString("CouponForm.14")); //$NON-NLS-1$
 		itemPanel.add(titlePanel, BorderLayout.NORTH);
 		tfSearch = new JTextField();
 		tfSearch.addActionListener(new ActionListener() {
@@ -170,7 +170,7 @@ public class CouponForm extends BeanEditor implements ItemListener {
 				doSearchItem();
 			}
 		});
-		btnSearch = new JButton("Search");
+		btnSearch = new JButton(Messages.getString("CouponForm.17")); //$NON-NLS-1$
 		btnSearch.addActionListener(new ActionListener() {
 
 			@Override
@@ -179,9 +179,10 @@ public class CouponForm extends BeanEditor implements ItemListener {
 			}
 		});
 		addedListItems = new CheckBoxList();
-		String[] colHeaders = new String[] { "Item name", "Item price" };
+		String[] colHeaders = new String[] { Messages.getString("CouponForm.18"), Messages.getString("CouponForm.19") }; //$NON-NLS-1$ //$NON-NLS-2$
 		itemModel = new ItemListModel(colHeaders);
 		addedListItems.setModel(itemModel);
+		addedListItems.setRowHeight(30);
 
 		DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
 		rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
@@ -190,10 +191,11 @@ public class CouponForm extends BeanEditor implements ItemListener {
 		itemPanel.add(itemSearchPanel, BorderLayout.SOUTH);
 		itemScrollPane = new JScrollPane(addedListItems);
 
-		JPanel centerPanel = new JPanel(new MigLayout("fill, ins 0"));
-		centerPanel.add(tfSearch, "grow, split 2");
-		centerPanel.add(btnSearch, "wrap");
-		centerPanel.add(itemScrollPane, "grow");
+		JPanel centerPanel = new JPanel(new MigLayout("fill, ins 0")); //$NON-NLS-1$
+		centerPanel.add(new JLabel(Messages.getString("CouponForm.21")), "split 3"); //$NON-NLS-1$ //$NON-NLS-2$
+		centerPanel.add(tfSearch,"grow"); //$NON-NLS-1$
+		centerPanel.add(btnSearch, "wrap"); //$NON-NLS-1$
+		centerPanel.add(itemScrollPane, "grow"); //$NON-NLS-1$
 		itemPanel.add(centerPanel, BorderLayout.CENTER);
 
 		add(contentPane, BorderLayout.WEST);
@@ -204,9 +206,9 @@ public class CouponForm extends BeanEditor implements ItemListener {
 
 	private void createItemSearchPanel() {
 		itemSearchPanel = new JPanel();
-		itemSearchPanel.setLayout(new MigLayout("ins 0, center"));
+		itemSearchPanel.setLayout(new MigLayout("ins 0, center")); //$NON-NLS-1$
 
-		JButton btnAdd = new JButton("ADD/EDIT ITEMS");
+		JButton btnAdd = new JButton(Messages.getString("CouponForm.27")); //$NON-NLS-1$
 		btnAdd.addActionListener(new ActionListener() {
 
 			@Override
@@ -263,7 +265,7 @@ public class CouponForm extends BeanEditor implements ItemListener {
 		Discount coupon = (Discount) getBean();
 		if (coupon.getId() == null) {
 			chkEnabled.setSelected(true);
-			tfMinimumQua.setText("0");
+			tfMinimumQua.setText(Messages.getString("CouponForm.20")); //$NON-NLS-1$
 			cbCouponType.setSelectedIndex(Discount.DISCOUNT_TYPE_PERCENTAGE);
 			return;
 		}

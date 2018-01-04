@@ -187,7 +187,6 @@ public class CheckBoxList<E> extends JTable {
 	public void resizeColWidth() {
 		getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		setShowGrid(false);
-		setRowHeight(30);
 		setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		if (getColumnModel() != null && getColumnCount() > 0) {
 			TableColumn column = getColumnModel().getColumn(0);

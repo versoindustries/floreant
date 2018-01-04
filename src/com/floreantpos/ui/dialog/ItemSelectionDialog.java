@@ -35,6 +35,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import com.floreantpos.Messages;
 import com.floreantpos.POSConstants;
 import com.floreantpos.config.AppProperties;
 import com.floreantpos.main.Application;
@@ -90,7 +91,7 @@ public class ItemSelectionDialog extends POSDialog implements ActionListener {
 		if (endNumber > totalNumber) {
 			endNumber = totalNumber;
 		}
-		lblNumberOfItem.setText(String.format("Showing %s to %s of %s", startNumber, endNumber, totalNumber));
+		lblNumberOfItem.setText(String.format("Showing %s to %s of %s", startNumber, endNumber, totalNumber)); //$NON-NLS-1$
 		btnBack.setEnabled(itemModel.hasPrevious());
 		btnForward.setEnabled(itemModel.hasNext());
 
@@ -102,11 +103,11 @@ public class ItemSelectionDialog extends POSDialog implements ActionListener {
 		setIconImage(Application.getPosWindow().getIconImage());
 
 		titlePanel = new TitlePanel();
-		titlePanel.setTitle("Select item");
+		titlePanel.setTitle(Messages.getString("ItemSelectionDialog.1")); //$NON-NLS-1$
 		add(titlePanel, BorderLayout.NORTH);
 
-		JPanel centerPanel = new JPanel(new MigLayout("hidemode 3, fill", "", ""));
-		JPanel leftPanel = new JPanel(new MigLayout("hidemode 3, fill, ins 0"));
+		JPanel centerPanel = new JPanel(new MigLayout("hidemode 3, fill", "", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		JPanel leftPanel = new JPanel(new MigLayout("hidemode 3, fill, ins 0")); //$NON-NLS-1$
 		tfSearchField = new JTextField();
 		tfSearchField.addActionListener(new ActionListener() {
 
@@ -115,7 +116,7 @@ public class ItemSelectionDialog extends POSDialog implements ActionListener {
 				initData();
 			}
 		});
-		PosButton btnSearch = new PosButton("Search");
+		PosButton btnSearch = new PosButton(Messages.getString("ItemSelectionDialog.6")); //$NON-NLS-1$
 		btnSearch.addActionListener(new ActionListener() {
 
 			@Override
@@ -123,8 +124,8 @@ public class ItemSelectionDialog extends POSDialog implements ActionListener {
 				initData();
 			}
 		});
-		btnBack = new JButton("<<< Previous");
-		btnForward = new JButton("Next >>>");
+		btnBack = new JButton(Messages.getString("ItemSelectionDialog.7")); //$NON-NLS-1$
+		btnForward = new JButton(Messages.getString("ItemSelectionDialog.8")); //$NON-NLS-1$
 		lblNumberOfItem = new JLabel();
 		btnBack.addActionListener(new ActionListener() {
 			@Override
@@ -143,11 +144,12 @@ public class ItemSelectionDialog extends POSDialog implements ActionListener {
 		});
 
 		cbListItems = new CheckBoxList();
-		String[] colHeaders = new String[] { "-", "Item name", "Item price" };
+		String[] colHeaders = new String[] { Messages.getString("ItemSelectionDialog.0"), Messages.getString("ItemSelectionDialog.10"), Messages.getString("ItemSelectionDialog.11") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		itemModel = new ItemCheckBoxListModel(colHeaders);
 		itemModel.setPageSize(20);
 		cbListItems.setModel(itemModel);
 		cbListItems.resizeColWidth();
+		cbListItems.setRowHeight(30);
 
 		DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
 		rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
@@ -161,10 +163,10 @@ public class ItemSelectionDialog extends POSDialog implements ActionListener {
 			}
 		});
 
-		cbShowSelected = new JCheckBox("Show selected items");
+		cbShowSelected = new JCheckBox(Messages.getString("ItemSelectionDialog.2")); //$NON-NLS-1$
 		btnGroup = new ButtonGroup();
-		JCheckBox cbSelectAll = new JCheckBox("Select all");
-		JCheckBox cbUnselectAll = new JCheckBox("Uncheck all");
+		JCheckBox cbSelectAll = new JCheckBox(Messages.getString("ItemSelectionDialog.13")); //$NON-NLS-1$
+		JCheckBox cbUnselectAll = new JCheckBox(Messages.getString("ItemSelectionDialog.14")); //$NON-NLS-1$
 		btnGroup.add(cbSelectAll);
 		btnGroup.add(cbUnselectAll);
 		cbShowSelected.addActionListener(new ActionListener() {
@@ -174,7 +176,7 @@ public class ItemSelectionDialog extends POSDialog implements ActionListener {
 				if (cbShowSelected.isSelected()) {
 					itemModel.setRows(selectedItems);
 					cbListItems.selectAll();
-					lblNumberOfItem.setText(String.format("Showing %s items", selectedItems.size()));
+					lblNumberOfItem.setText(String.format("Showing %s items", selectedItems.size())); //$NON-NLS-1$
 					btnBack.setEnabled(false);
 					btnForward.setEnabled(false);
 				}
@@ -212,20 +214,20 @@ public class ItemSelectionDialog extends POSDialog implements ActionListener {
 				}
 			}
 		});
+		leftPanel.add(new JLabel(Messages.getString("ItemSelectionDialog.16")), "span, growy, split 3"); //$NON-NLS-1$ //$NON-NLS-2$
+		leftPanel.add(tfSearchField,"grow"); //$NON-NLS-1$
+		leftPanel.add(btnSearch, "wrap"); //$NON-NLS-1$
+		leftPanel.add(new JScrollPane(cbListItems), "span, grow,wrap"); //$NON-NLS-1$
 
-		leftPanel.add(tfSearchField, "span, grow,split 2");
-		leftPanel.add(btnSearch, "wrap");
-		leftPanel.add(new JScrollPane(cbListItems), "span, grow,wrap");
-
-		leftPanel.add(cbShowSelected, "left, split 3");
+		leftPanel.add(cbShowSelected, "left, split 3"); //$NON-NLS-1$
 		leftPanel.add(cbSelectAll);
 		leftPanel.add(cbUnselectAll);
 
-		leftPanel.add(lblNumberOfItem, "right, split 3");
+		leftPanel.add(lblNumberOfItem, "right, split 3"); //$NON-NLS-1$
 		leftPanel.add(btnBack);
 		leftPanel.add(btnForward);
 
-		btnAdd = new PosButton("ADD");
+		btnAdd = new PosButton(Messages.getString("ItemSelectionDialog.23")); //$NON-NLS-1$
 		btnAdd.setFocusable(false);
 		btnAdd.addActionListener(this);
 
@@ -237,13 +239,13 @@ public class ItemSelectionDialog extends POSDialog implements ActionListener {
 		btnCancel.setFocusable(false);
 		btnCancel.addActionListener(this);
 
-		JPanel footerPanel = new JPanel(new MigLayout("ins 2, center", "", ""));
-		footerPanel.add(btnOk, "w 100!, center, split 2");
-		footerPanel.add(btnCancel, "w 100!");
+		JPanel footerPanel = new JPanel(new MigLayout("ins 2, center", "", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		footerPanel.add(btnOk, "w 100!, center, split 2"); //$NON-NLS-1$
+		footerPanel.add(btnCancel, "w 100!"); //$NON-NLS-1$
 
 		add(footerPanel, BorderLayout.SOUTH);
 
-		centerPanel.add(leftPanel, "grow");
+		centerPanel.add(leftPanel, "grow"); //$NON-NLS-1$
 
 		add(centerPanel, BorderLayout.CENTER);
 
