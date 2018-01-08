@@ -73,7 +73,6 @@ import com.floreantpos.ui.dialog.POSMessageDialog;
 
 public class KitchenTicketView extends JPanel {
 	private KitchenTicket kitchenTicket;
-	private JLabel ticketId = new JLabel();
 	private KitchenTicketTableModel tableModel;
 	private JTable table;
 	private KitchenTicketStatusSelector statusSelector;
@@ -97,8 +96,7 @@ public class KitchenTicketView extends JPanel {
 		createButtonPanel();
 
 		statusSelector = new KitchenTicketStatusSelector((Frame) SwingUtilities.getWindowAncestor(this), ticket);
-		statusSelector.pack();
-
+	
 		setPreferredSize(PosUIManager.getSize(350, 240));
 
 		timerWatch.start();
