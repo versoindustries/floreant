@@ -96,11 +96,6 @@ public class KitchenTicketView extends JPanel {
 		createButtonPanel();
 
 		statusSelector = new KitchenTicketStatusSelector((Frame) SwingUtilities.getWindowAncestor(this), ticket);
-		try {
-			statusSelector.pack();
-		} catch (Exception e) {
-		}
-
 		setPreferredSize(PosUIManager.getSize(350, 240));
 
 		timerWatch.start();
@@ -219,6 +214,7 @@ public class KitchenTicketView extends JPanel {
 					return;
 				}
 				statusSelector.setTicketItem(ticketItem);
+				statusSelector.setSize(PosUIManager.getSize(320, 180));
 				statusSelector.setLocationRelativeTo(KitchenTicketView.this);
 				statusSelector.setVisible(true);
 				table.repaint();
