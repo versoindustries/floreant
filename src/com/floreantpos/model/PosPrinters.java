@@ -97,21 +97,6 @@ public class PosPrinters {
 		return defaultKitchenPrinter;
 	}
 
-	public Printer getDefaultPrinter() {
-		if (getKitchenPrinters().size() > 0) {
-			defaultKitchenPrinter = kitchenPrinters.get(0);
-
-			for (Printer printer : kitchenPrinters) {
-				if (printer.isDefaultPrinter()) {
-					defaultKitchenPrinter = printer;
-					break;
-				}
-			}
-		}
-
-		return defaultKitchenPrinter;
-	}
-
 	public Printer getKitchenPrinterFor(VirtualPrinter vp) {
 		return kitchePrinterMap.get(vp);
 	}
@@ -195,6 +180,11 @@ public class PosPrinters {
 	}
 
 	public static String getDefaultPrinterName() {
+		PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
+		if (defaultPrintService != null) {
+			return defaultPrintService.getName();
+		}
+
 		PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
 		if (services.length > 0) {
 			return services[0].getName();
