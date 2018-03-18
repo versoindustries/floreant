@@ -86,11 +86,6 @@ public class SettleTicketProcessor implements CardInputListener {
 				return;
 			}
 
-			/*if (ticket.getOrderType().isBarTab()) { //fix
-				doSettleBarTabTicket(ticket);
-				return;
-			}*/
-
 			if (ticket.getId() == null) {
 				OrderController.saveOrder(ticket);
 			}
