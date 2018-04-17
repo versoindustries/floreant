@@ -321,6 +321,10 @@ public class Ticket extends BaseTicket {
 		}
 	}
 
+	public Double getTotalAmountWithTips() {
+		return super.getTotalAmount() + getGratuityAmount();
+	}
+	
 	public void updateTicketItemPriceByOrderType(String name) {
 		List<TicketItem> ticketItems = getTicketItems();
 		if (ticketItems == null) {

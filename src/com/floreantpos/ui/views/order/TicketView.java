@@ -422,6 +422,23 @@ public class TicketView extends JPanel {
 		//}
 	}
 
+	
+	private void showCustomerDisplayInfo(Object selected) {
+		if (TerminalConfig.isActiveCustomerDisplay()) {
+			TicketItem ticketItem = null;
+			if (selected instanceof TicketItemModifier) {
+				ticketItem = ((TicketItemModifier) selected).getTicketItem();
+			}
+			else if (selected instanceof TicketItem) {
+				ticketItem = (TicketItem) selected;
+			}
+			if (ticketItem != null) {
+				String sendMessageToCustomerDisplay = getDisplayMessage(ticketItem, NumberUtil.formatNumber(ticket.getTotalAmount(), true));
+				DrawerUtil.setItemDisplay(TerminalConfig.getCustomerDisplayPort(), sendMessageToCustomerDisplay);
+			}
+		}
+	}
+	
 	private void closeView(boolean orderCanceled) {
 		if (orderCanceled && ticket.getId() == null && ticket.getOrderType().isShowTableSelection()) {
 			doReleaseTables();
@@ -633,7 +650,7 @@ public class TicketView extends JPanel {
 			}
 		}
 
-		btnTotal.setText(POSConstants.TOTAL.toUpperCase() + " " + CurrencyUtil.getCurrencySymbol() + NumberUtil.formatNumber(ticket.getTotalAmount()));
+		btnTotal.setText(POSConstants.TOTAL.toUpperCase() + " " + CurrencyUtil.getCurrencySymbol() + NumberUtil.formatNumber(ticket.getTotalAmount(),true));
 		/*if (ticket.getTotalAmount() > 0) {
 			//btnTotal.setText("<html><h2>Total " + Application.getCurrencySymbol() + NumberUtil.formatNumber(ticket.getTotalAmount()) + "</h2></html>");
 			btnTotal.setText("Total " +Application.getCurrencySymbol() + NumberUtil.formatNumber(ticket.getTotalAmount()));
@@ -655,6 +672,7 @@ public class TicketView extends JPanel {
 			*/}
 
 		ticketViewerTable.updateView();
+		showCustomerDisplayInfo(ticketViewerTable.getSelected());
 	}
 
 	public void addOrderListener(OrderListener listenre) {
@@ -742,6 +760,7 @@ public class TicketView extends JPanel {
 					}
 				}
 			}
+			showCustomerDisplayInfo(selected);
 		}
 	}
 
@@ -753,23 +772,24 @@ public class TicketView extends JPanel {
 	}
 
 	private String getDisplayMessage(ITicketItem item, String totalPrice) {
-
-		int currentItemLenth = item.getNameDisplay().length();
-		String ticketItems;
-		if (currentItemLenth > 12) {
-			ticketItems = item.getNameDisplay().substring(0, 12);
+		String itemName = item.getNameDisplay();
+		if (itemName.length() > 10) {
+			itemName = item.getNameDisplay().substring(0, 10);
 		}
 		else {
-			ticketItems = item.getNameDisplay();
+			itemName = item.getNameDisplay();
 		}
-		String quantity = item.getItemQuantityDisplay();
-		double itemPrice = item.getUnitPriceDisplay();
+		double itemPrice = item.getSubTotalAmountDisplay() == null ? 0 : item.getSubTotalAmountDisplay();
+		String line = String.format("%-10s %9s", itemName, NumberUtil.formatNumber(itemPrice, true)); //$NON-NLS-1$
+		if (line.length() > 20) {
+			line = line.substring(0, 20);
+		}
 
-		String line = String.format("%-1s %-12s %4s", quantity, ticketItems, itemPrice);
-
-		String total = "TOTAL" + CurrencyUtil.getCurrencySymbol();
-		String line2 = String.format("%-6s %13s", total, totalPrice);
-
+		String total = "TOTAL" + CurrencyUtil.getCurrencySymbol(); //$NON-NLS-1$
+		String line2 = String.format("%-8s %11s", total, totalPrice); //$NON-NLS-1$
+		if (line2.length() > 20) {
+			line2 = line2.substring(0, 20);
+		}
 		return line + line2;
 	}
 

@@ -76,6 +76,21 @@ public class NumberUtil {
 		return value;
 	}
 	
+	public static String formatNumber(Double number, boolean isAllowedNegative) {
+		if (number == null) {
+			return numberFormat.format(0);
+		}
+
+		String value = numberFormat.format(number);
+
+		if (!isAllowedNegative) {
+			if (value.startsWith("-")) { //$NON-NLS-1$
+				return numberFormat.format(0);
+			}
+		}
+		return value;
+	}
+	
 	public static Number parse(String number) throws ParseException {
 		if (StringUtils.isEmpty(number)) {
 			return 0;
